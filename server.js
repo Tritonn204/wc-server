@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { ethers } from 'ethers';
 import { createRequire } from 'module';
+import * as gameConstants from 'logic/params.js';
 
 const require = createRequire(import.meta.url);
 
@@ -19,9 +20,6 @@ const ftmProvider = new ethers.providers.JsonRpcProvider(url);
 const wallet = new ethers.Wallet(process.env.PRIVKEY, ftmProvider);
 const verifierABI = require('./contractABIs/verifier.json');
 const verifier = new ethers.Contract(process.env.TESTVERIFIER, verifierABI, wallet);
-
-//Game logic import
-const gameConstants = require('./logic/params.js');
 
 //Game State Data
 const duelData = [];
@@ -73,7 +71,8 @@ duelContract.on('DuelStarted', (AtokenID, BtokenID, addressAAddress, AddressANam
     matchSize: matchSize,
     matchType: queueType,
     startTime: now,
-    matchOver: false
+    matchOver: false,
+    index: duelIndex
   };
 });
 
@@ -99,6 +98,9 @@ io.on("connection", socket => {
   });
 
   socket.on('fetchMatch', (cb) => {
-    cb(duelData[duelsByWallet[socket.userData.wallet]]);
+    if (duelsByWallet[socket.userData.wallet] && duelData[duelsByWallet[socket.userData.wallet]]){
+      socket.join(duelsByWallet[socket.userData.wallet]);
+      cb(duelData[duelsByWallet[socket.userData.wallet]]);
+    }
   })
 });
