@@ -1,4 +1,4 @@
-import { PRIVKEY, TESTVERIFIER } from './config.js';
+import { envs } from './config.js';
 import { ethers } from 'ethers';
 import { createRequire } from 'module';
 import * as gameConstants from './logic/params.js';
@@ -18,13 +18,13 @@ console.log(`Listening on port ${port}`);
 
 const url = 'https://rpc.testnet.fantom.network/';
 const ftmProvider = new ethers.providers.JsonRpcProvider(url);
-const wallet = new ethers.Wallet(PRIVKEY, ftmProvider);
+const wallet = new ethers.Wallet(envs.PRIVKEY, ftmProvider);
 
 const verifierABI = require('./contractABIs/verifier.json');
 const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
 
-const verifier = new ethers.Contract(TESTVERIFIER, verifierABI, wallet);
+const verifier = new ethers.Contract(envs.TESTVERIFIER, verifierABI, wallet);
 const duelContract = new ethers.Contract('0xFEa5bE110e1f22CF069fdA56c11ebC7789fCfC5c', duelABI, wallet);
 const nftContract = new ethers.Contract('0x340B62591a489CDe3906690e59a3b4D154024B32', nftABI, wallet);
 
