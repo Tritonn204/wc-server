@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { PRIVKEY } from './config';
 import { ethers } from 'ethers';
 import { createRequire } from 'module';
 import * as gameConstants from './logic/params.js';
@@ -18,7 +18,7 @@ console.log(`Listening on port ${port}`);
 
 const url = 'https://rpc.testnet.fantom.network/';
 const ftmProvider = new ethers.providers.JsonRpcProvider(url);
-const wallet = new ethers.Wallet(process.env.PRIVKEY, ftmProvider);
+const wallet = new ethers.Wallet(PRIVKEY, ftmProvider);
 
 const verifierABI = require('./contractABIs/verifier.json');
 const duelABI = require('./contractABIs/duel.json');
