@@ -79,7 +79,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
       Spd: statsA.data().SPD,
       Weapons: [statsA.data().WeaponLeft,statsA.data().WeaponRight],
       Type: statsA.data().WeaponLeft,
-      nextTurn: (gameConstants.timer/statsA.data().SPD) + 8 + startTime
+      nextTurn: ((gameConstants.timer/statsA.data().SPD) + 8)*1000 + startTime
     });
     B.push({
       Owner: ownerB,
@@ -91,7 +91,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
       Spd: statsB.data().SPD,
       Weapons: [statsB.data().WeaponLeft,statsB.data().WeaponRight],
       Type: statsB.data().WeaponLeft,
-      nextTurn: (gameConstants.timer/statsB.data().SPD) + 8 + startTime
+      nextTurn: ((gameConstants.timer/statsB.data().SPD) + 8)*1000 + startTime
     });
   }
 
@@ -108,7 +108,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     index: onChainIndex.toNumber()
   };
 
-  console.log(JSON.stringify(duelData[duelIndex], null, 2));
+  //console.log(JSON.stringify(duelData[duelIndex], null, 2));
 });
 
 const io = new socketIo.Server(server, {

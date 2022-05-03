@@ -77,7 +77,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           advantage: advantage
         });
 
-        matchData.a[matchData.currentCardA].NextTurn = (gameConstants.timer/matchData.a[matchData.currentCardA].Spd) + 8 + now;
+        matchData.a[matchData.currentCardA].NextTurn = ((gameConstants.timer/matchData.a[matchData.currentCardA].Spd) + 8)*1000 + now;
         matchData.a[matchData.currentCardA].Type = matchData.a[matchData.currentCardA].Weapons[weaponChoice];
 
         if(damage > matchData.b[matchData.currentCardB].Hp){
@@ -135,7 +135,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           advantage: advantage
         });
 
-        matchData.b[matchData.currentCardB].NextTurn = (gameConstants.timer/matchData.b[matchData.currentCardB].Spd) + 8 + now;
+        matchData.b[matchData.currentCardB].NextTurn = ((gameConstants.timer/matchData.b[matchData.currentCardB].Spd) + 8)*1000 + now;
         matchData.b[matchData.currentCardB].Type = matchData.b[matchData.currentCardB].Weapons[weaponChoice];
 
         if(damage > matchData.a[matchData.currentCardA].Hp){
@@ -186,25 +186,25 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           if(matchData.a[data.newCard].Hp <= 0) return;
           matchData.currentCardA = data.newCard;
           if(matchData.a[currentCardA].NextTurn < 8 + now){
-              matchData.a[currentCardA].NextTurn = 8 + now;
+              matchData.a[currentCardA].NextTurn = 8*1000 + now;
           }
       }else if(account == matchData.b[0].Owner){
         if(data.newCard == matchData.currentCardA) return;
         if(matchData.b[data.newCard].Hp <= 0) return;
           matchData.currentCardB = data.newCard;
           if(matchData.b[currentCardB].NextTurn < 8 + now) {
-              matchData.b[currentCardB].NextTurn = 8 + now;
+              matchData.b[currentCardB].NextTurn = 8*1000 + now;
           }
       }
       socket.broadcast.emit('swapCard', {
         user: account,
         newCard: data.newCard,
-        nextTurn: 8 + now
+        nextTurn: 8*1000 + now
       });
       if (typeof cb == 'function') cb({
         user: account,
         newCard: data.newCard,
-        nextTurn: 8 + now
+        nextTurn: 8*1000 + now
       });
     }
     if (data.action == 'heal') {
@@ -237,7 +237,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.a[card].Hp += healing;
         }
 
-        matchData.a[currentCardA].NextTurn = (timer()/_matchInfo[matchIndex].a[currentCardA].Spd) + 8 + now;
+        matchData.a[currentCardA].NextTurn = ((gameConstants.timer/_matchInfo[matchIndex].a[currentCardA].Spd) + 8)*1000 + now;
       }else{
         if (matchData.b[currentCardB].Weapons[1] != 0) return;
         if (matchData.b[card].Hp <= 0) return;
@@ -257,7 +257,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.b[card].Hp += healing;
         }
 
-        matchData.b[currentCardA].NextTurn = (timer()/_matchInfo[matchIndex].b[currentCardB].Spd) + 8 + now;
+        matchData.b[currentCardA].NextTurn = ((gameConstants.timer/_matchInfo[matchIndex].b[currentCardB].Spd) + 8)*1000 + now;
       }
     }
   });
