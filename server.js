@@ -1,4 +1,4 @@
-import { PRIVKEY, TESTVERIFIER } from './config';
+import { PRIVKEY, TESTVERIFIER } from './config.js';
 import { ethers } from 'ethers';
 import { createRequire } from 'module';
 import * as gameConstants from './logic/params.js';
