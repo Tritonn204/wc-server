@@ -1,4 +1,4 @@
-import { PRIVKEY } from './config';
+import { PRIVKEY, TESTVERIFIER } from './config';
 import { ethers } from 'ethers';
 import { createRequire } from 'module';
 import * as gameConstants from './logic/params.js';
@@ -24,7 +24,7 @@ const verifierABI = require('./contractABIs/verifier.json');
 const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
 
-const verifier = new ethers.Contract(process.env.TESTVERIFIER, verifierABI, wallet);
+const verifier = new ethers.Contract(TESTVERIFIER, verifierABI, wallet);
 const duelContract = new ethers.Contract('0xFEa5bE110e1f22CF069fdA56c11ebC7789fCfC5c', duelABI, wallet);
 const nftContract = new ethers.Contract('0x340B62591a489CDe3906690e59a3b4D154024B32', nftABI, wallet);
 
