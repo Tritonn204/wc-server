@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import { ethers } from 'ethers';
 import { createRequire } from 'module';
-import * as gameConstants from 'logic/params.js';
+import * as gameConstants from './logic/params.js';
+import * as battleLogic from './logic/battle.js';
 
 const require = createRequire(import.meta.url);
 
@@ -18,62 +19,96 @@ console.log(`Listening on port ${port}`);
 const url = 'https://rpc.testnet.fantom.network/';
 const ftmProvider = new ethers.providers.JsonRpcProvider(url);
 const wallet = new ethers.Wallet(process.env.PRIVKEY, ftmProvider);
+
 const verifierABI = require('./contractABIs/verifier.json');
+const duelABI = require('./contractABIs/duel.json');
+const nftABI = require('./contractABIs/nft.json');
+
 const verifier = new ethers.Contract(process.env.TESTVERIFIER, verifierABI, wallet);
+const duelContract = new ethers.Contract('0xFEa5bE110e1f22CF069fdA56c11ebC7789fCfC5c', duelABI, wallet);
+const nftContract = new ethers.Contract('0x340B62591a489CDe3906690e59a3b4D154024B32', nftABI, wallet);
+
+const admin = require('firebase-admin');
+const serviceAccount = require('./wcgame-firebase-key');
+
+const app = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://wcgame-default-rtdb.firebaseio.com"
+})
+
+const db = admin.firestore();
 
 //Game State Data
 const duelData = [];
-const duelIndex = 0;
+let duelIndex = 0;
 const duelByWallet = {};
 
-duelContract.on('DuelStarted', (AtokenID, BtokenID, addressAAddress, AddressAName, addressBAddress, addressBName, queueType, matchSize) => {
+duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
+  console.log(matchInfo);
+
   const currentIndex = duelIndex.valueOf();
   duelIndex++;
 
-  duelByWallet[addressAAddress] = currentIndex;
-  duelByWallet[addressBAddress] = currentIndex;
-
   const startTime = Date.now();
 
-  const A = []
-  const B = []
+  const A = [];
+  const B = [];
+
+  const matchSize = matchInfo.a.length;
+  const onChainIndex = await duelContract._matchesCount();
+
+  const ownerA = matchInfo.addressA;
+  const ownerB = matchInfo.addressB;
+
+  duelByWallet[ownerA.toLowerCase()] = currentIndex;
+  duelByWallet[ownerB.toLowerCase()] = currentIndex;
+
+  const recordA = await duelContract.walletRecord(ownerA.toLowerCase());
+  const recordB = await duelContract.walletRecord(ownerB.toLowerCase());
 
   for(let i = 0; i < matchSize; i++) {
+    const statsA = await db.collection('Stats').doc(`${matchInfo.a[i].toNumber()}`).get();
+    const statsB = await db.collection('Stats').doc(`${matchInfo.b[i].toNumber()}`).get();
     A.push({
-      Owner: addressAAddress,
-      tokenId: AtokenID,
-      hp: 10000,
-      att: 1000,
-      def: 800,
-      spd: 350,
-      weapons: [1,2],
-      type: 1,
-      nextTurn: (gameConstants.timer/350) + 8 + now
+      Owner: ownerA,
+      TokenID: matchInfo.a[i].toNumber(),
+      MaxHP: statsA.data().HP,
+      Hp: statsA.data().HP,
+      Att: statsA.data().ATT,
+      Def: statsA.data().DEF,
+      Spd: statsA.data().SPD,
+      Weapons: [statsA.data().WeaponLeft,statsA.data().WeaponRight],
+      Type: statsA.data().WeaponLeft,
+      nextTurn: (gameConstants.timer/statsA.data().SPD) + 8 + startTime
     });
     B.push({
-      Owner: addressBAddress,
-      tokenId: BtokenID,
-      hp: 10000,
-      att: 1000,
-      def: 800,
-      spd: 350,
-      weapons: [2,3],
-      type: 2,
-      nextTurn: (gameConstants.timer/350) + 8 + now
+      Owner: ownerB,
+      TokenID: matchInfo.b[i].toNumber(),
+      MaxHP: statsB.data().HP,
+      Hp: statsB.data().HP,
+      Att: statsB.data().ATT,
+      Def: statsB.data().DEF,
+      Spd: statsB.data().SPD,
+      Weapons: [statsB.data().WeaponLeft,statsB.data().WeaponRight],
+      Type: statsB.data().WeaponLeft,
+      nextTurn: (gameConstants.timer/statsB.data().SPD) + 8 + startTime
     });
   }
 
   duelData[duelIndex] = {
     a: A,
     b: B,
+    eloA: recordA.elo.toNumber(),
+    eloB: recordB.elo.toNumber(),
     currentCardA: 0,
     currentCardB: 0,
     matchSize: matchSize,
-    matchType: queueType,
-    startTime: now,
+    startTime: startTime,
     matchOver: false,
-    index: duelIndex
+    index: onChainIndex.toNumber()
   };
+
+  console.log(JSON.stringify(duelData[duelIndex], null, 2));
 });
 
 const io = new socketIo.Server(server, {
@@ -100,7 +135,12 @@ io.on("connection", socket => {
   socket.on('fetchMatch', (cb) => {
     if (duelsByWallet[socket.userData.wallet] && duelData[duelsByWallet[socket.userData.wallet]]){
       socket.join(duelsByWallet[socket.userData.wallet]);
+      battleLogic.battleActionListener(duelData[duelsByWallet[socket.userData.wallet]] ,socket, battleContract);
       cb(duelData[duelsByWallet[socket.userData.wallet]]);
     }
+  });
+
+  socket.on('disconnect', () => {
+    delete socket.userData;
   })
 });
