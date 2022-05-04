@@ -7,20 +7,13 @@ import * as battleLogic from './logic/battle.js';
 const require = createRequire(import.meta.url);
 
 const express = require('express');
+var cors = require('cors');
+var expressApp = express();
+expressApp.use(cors());
 
 const http = require('http');
 const port = parseInt(process.env.PORT) || 4000;
-const server = http.createServer(function(req,res){
-	// Set CORS headers
-	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.setHeader('Access-Control-Request-Method', '*');
-	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
-	res.setHeader('Access-Control-Allow-Headers', '*');
-	if ( req.method === 'OPTIONS' ) {
-		res.writeHead(200);
-		res.end();
-		return;
-	});
+const server = http.createServer(expressApp);
 const socketIo = require('socket.io');
 const interval = 1/10;
 
