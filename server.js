@@ -15,7 +15,7 @@ const http = require('http');
 const port = parseInt(process.env.PORT) || 4000;
 const server = http.createServer(expressApp);
 const socketIo = require('socket.io');
-const interval = 1/10;
+const interval = 1000/20;
 
 server.listen(port);
 console.log(`Listening on port ${port}`);
