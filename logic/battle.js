@@ -237,6 +237,8 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           if(matchData.a[currentCardA].nextTurn < 8*1000 + now){
             newNextTurn = 8*1000 + now;
             matchData.a[currentCardA].nextTurn = newNextTurn;
+          } else {
+            newNextTurn = matchData.a[currentCardA].nextTurn;
           }
       }else if(account == matchData.b[0].Owner){
         if(data.newCard == matchData.currentCardB) return;
@@ -245,6 +247,8 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           if(matchData.b[currentCardB].nextTurn < 8*1000 + now) {
             newNextTurn = 8*1000 + now;
             matchData.b[currentCardB].nextTurn = newNextTurn;
+          } else {
+            newNextTurn = matchData.b[currentCardB].nextTurn;
           }
       }
       socket.broadcast.emit('swapCard', {
