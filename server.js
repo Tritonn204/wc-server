@@ -9,13 +9,7 @@ const require = createRequire(import.meta.url);
 const express = require('express');
 var cors = require('cors');
 var expressApp = express();
-expressApp.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
-  next();
-});
+expressApp.use(cors());
 
 const http = require('http');
 const port = parseInt(process.env.PORT) || 4000;
@@ -172,8 +166,8 @@ const startBroadcast = (room) => {
             })
             setTimeout(heartbeat, interval);
         } else {
-          duelsByWallet[duelData[room].ownerA] = undefined;
-          duelsByWallet[duelData[room].ownerB] = undefined;
+          duelByWallet[duelData[room].ownerA] = undefined;
+          duelByWallet[duelData[room].ownerB] = undefined;
         }
     }
     return setTimeout(heartbeat, interval);
