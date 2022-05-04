@@ -134,6 +134,10 @@ io.on("connection", socket => {
     socket.userData.wallet = recovered.toLowerCase();
   });
 
+  socket.on('sendEmote', e => {
+    socket.broadcast.emit('getEmote', e);
+  })
+
   socket.on('fetchMatch', (cb) => {
     if (duelByWallet[socket.userData.wallet] != undefined && duelData[duelByWallet[socket.userData.wallet]] != undefined) {
       console.log('found');
