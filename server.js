@@ -166,8 +166,8 @@ const startBroadcast = (room) => {
             })
             setTimeout(heartbeat, interval);
         } else {
-          duelByWallet[duelData[room].ownerA] = undefined;
-          duelByWallet[duelData[room].ownerB] = undefined;
+          duelByWallet[duelData[room].a[0].Owner] = undefined;
+          duelByWallet[duelData[room].b[0].Owner] = undefined;
         }
     }
     return setTimeout(heartbeat, interval);
