@@ -115,7 +115,15 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
 });
 
-const io = new socketIo.Server(server);
+const io = new socketIo.Server(server, {
+  cors: {
+    origin: [
+      "http://localhost:3000"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 io.on("connection", socket => {
   socket.userData = {};
