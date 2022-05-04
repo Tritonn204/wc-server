@@ -10,8 +10,19 @@ const express = require('express');
 
 const http = require('http');
 const port = parseInt(process.env.PORT) || 4000;
-const server = http.createServer();
+const server = http.createServer(function(req,res){
+	// Set CORS headers
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader('Access-Control-Request-Method', '*');
+	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+	res.setHeader('Access-Control-Allow-Headers', '*');
+	if ( req.method === 'OPTIONS' ) {
+		res.writeHead(200);
+		res.end();
+		return;
+	});
 const socketIo = require('socket.io');
+const interval = 1/10;
 
 server.listen(port);
 console.log(`Listening on port ${port}`);
@@ -44,8 +55,6 @@ let duelIndex = 0;
 const duelByWallet = {};
 
 duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
-  console.log(matchInfo);
-
   const currentIndex = duelIndex.valueOf();
   duelIndex++;
 
@@ -57,8 +66,8 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   const matchSize = matchInfo.a.length;
   const onChainIndex = await duelContract._matchesCount();
 
-  const ownerA = matchInfo.addressA;
-  const ownerB = matchInfo.addressB;
+  const ownerA = matchInfo.addressA.toLowerCase();
+  const ownerB = matchInfo.addressB.toLowerCase();
 
   duelByWallet[ownerA.toLowerCase()] = currentIndex;
   duelByWallet[ownerB.toLowerCase()] = currentIndex;
@@ -91,11 +100,13 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
       Spd: statsB.data().SPD,
       Weapons: [statsB.data().WeaponLeft,statsB.data().WeaponRight],
       Type: statsB.data().WeaponLeft,
-      nextTurn: ((gameConstants.timer/statsB.data().SPD) + 8)*1000 + startTime
+      nextTurn: ((gameConstants.timer/statsB.data().SPD) + 8)*1000 + startTime,
+      room: currentIndex
     });
+    startBroadcast(currentIndex);
   }
 
-  duelData[duelIndex] = {
+  duelData[currentIndex] = {
     a: A,
     b: B,
     eloA: recordA.elo.toNumber(),
@@ -114,7 +125,6 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
 const io = new socketIo.Server(server, {
   cors: {
     origin: [
-      "https://youthful-keller-2f50ca.netlify.app",
       "http://localhost:3000"
     ],
     methods: ["GET", "POST"],
@@ -125,18 +135,18 @@ const io = new socketIo.Server(server, {
 io.on("connection", socket => {
   socket.userData = {};
 
-  socket.on('setWallet', async (data, cb) => {
+  socket.on('setWallet', async (data) => {
     let sig = ethers.utils.splitSignature(data.signature);
     let recovered = await verifier.verifyString(data.message, sig.v, sig.r, sig.s);
-    socket.userData.wallet = recovered;
-    if (typeof cb == 'function' && data.wallet == recovered) cb(recovered);
+    socket.userData.wallet = recovered.toLowerCase();
   });
 
   socket.on('fetchMatch', (cb) => {
-    if (duelsByWallet[socket.userData.wallet] && duelData[duelsByWallet[socket.userData.wallet]]){
-      socket.join(duelsByWallet[socket.userData.wallet]);
-      battleLogic.battleActionListener(duelData[duelsByWallet[socket.userData.wallet]] ,socket, battleContract);
-      cb(duelData[duelsByWallet[socket.userData.wallet]]);
+    if (duelByWallet[socket.userData.wallet] != undefined && duelData[duelByWallet[socket.userData.wallet]] != undefined) {
+      console.log('found');
+      socket.join(duelByWallet[socket.userData.wallet]);
+      battleLogic.battleActionListener(duelData[duelByWallet[socket.userData.wallet]] ,socket, duelContract);
+      if (typeof cb == 'function') cb(duelData[duelByWallet[socket.userData.wallet]]);
     }
   });
 
@@ -144,3 +154,21 @@ io.on("connection", socket => {
     delete socket.userData;
   })
 });
+
+const startBroadcast = (room) => {
+    const heartbeat = async () => {
+        //Once match is cleared from memory, the loop will cease
+        if (duelData[room] && !duelData[room].matchOver){
+            let pack = {};
+
+            const time =  Date.now();
+
+            const clientList = await io.in(room).fetchSockets()
+            clientList.forEach(socket => {
+                socket.volatile.emit('update', time);
+            })
+            setTimeout(heartbeat, interval);
+        }
+    }
+    return setTimeout(heartbeat, interval);
+}

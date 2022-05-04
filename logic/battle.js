@@ -23,10 +23,10 @@ export const calculateElo = (eloA, eloB, winner) => {
     loserElo = eloA;
   }
 
-  if(!winnerElo){
+  if(winnerElo == 0){
       winnerElo = 1000;
   }
-  if(!loserElo){
+  if(loserElo == 0){
       loserRecord = 1000;
   }
 
@@ -52,17 +52,20 @@ export const calculateElo = (eloA, eloB, winner) => {
       loserElo = Elo1 - newElo;
   }
 
-  return {winnerElo: winnerElo, loserElo: loserElo};
+  return {winnerElo: Math.round(winnerElo), loserElo: Math.round(loserElo)};
 }
 
 export const battleActionListener = (matchData, socket, battleContract) => {
+  if (!matchData) return;
+  if (Object.keys(matchData).length < 1) return;
   const account = socket.userData.wallet;
   socket.on('input', async (data, cb) => {
     const now = Date.now();
     if (data.action == 'attack') {
-      const choice = data.weaponChoice;
+      const weaponChoice = data.weaponChoice;
       if (account == matchData.a[0].Owner) {
-        let delta = (now - matchData.a[matchData.currentCardA].NextTurn)/1000;
+        if (now < matchData.a[matchData.currentCardA].nextTurn) return;
+        let delta = (now - matchData.a[matchData.currentCardA].nextTurn)/1000;
 
         var currentCrit = 0.01 * Math.pow(1.0+(critCurve), delta);
         currentCrit = Math.min(0.33, currentCrit);
@@ -77,7 +80,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           advantage: advantage
         });
 
-        matchData.a[matchData.currentCardA].NextTurn = ((gameConstants.timer/matchData.a[matchData.currentCardA].Spd) + 8)*1000 + now;
+        matchData.a[matchData.currentCardA].nextTurn = ((gameConstants.timer/matchData.a[matchData.currentCardA].Spd) + 8)*1000 + now;
         matchData.a[matchData.currentCardA].Type = matchData.a[matchData.currentCardA].Weapons[weaponChoice];
 
         if(damage > matchData.b[matchData.currentCardB].Hp){
@@ -93,12 +96,15 @@ export const battleActionListener = (matchData, socket, battleContract) => {
                       damage: damage,
                       type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
                       advantage: advantage,
-                      newCard: i
+                      newCard: i,
+                      nextTurn: matchData.a[matchData.currentCardA].nextTurn
                     });
                     return;
                 }
             }
             matchData.matchOver = true;
+            const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 0);
+            await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
             if (typeof cb == 'function') cb({
               death: true,
               end: true,
@@ -106,8 +112,9 @@ export const battleActionListener = (matchData, socket, battleContract) => {
               type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
               advantage: advantage
             });
-            const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 0);
-            await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
+            //socket.off('input');
+            socket.leave(matchData.room);
+            matchData = null;
         } else{
             matchData.b[matchData.currentCardB].Hp = matchData.b[matchData.currentCardB].Hp - damage;
             if (typeof cb == 'function') cb({
@@ -116,11 +123,12 @@ export const battleActionListener = (matchData, socket, battleContract) => {
               damage: damage,
               type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
               advantage: advantage,
-              newCard: i
+              nextTurn: matchData.a[matchData.currentCardA].nextTurn
             });
         }
-      } else if (account == battleData.b[0].Owner) {
-        let delta = (now - matchData.b[matchData.currentCardB].NextTurn)/1000;
+      } else if (account == matchData.b[0].Owner) {
+        if (now < matchData.b[matchData.currentCardB].nextTurn) return;
+        let delta = (now - matchData.b[matchData.currentCardB].nextTurn)/1000;
 
         var currentCrit = 0.01 * Math.pow(1.0+(critCurve), delta);
         currentCrit = Math.min(0.33, currentCrit);
@@ -135,7 +143,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
           advantage: advantage
         });
 
-        matchData.b[matchData.currentCardB].NextTurn = ((gameConstants.timer/matchData.b[matchData.currentCardB].Spd) + 8)*1000 + now;
+        matchData.b[matchData.currentCardB].nextTurn = ((gameConstants.timer/matchData.b[matchData.currentCardB].Spd) + 8)*1000 + now;
         matchData.b[matchData.currentCardB].Type = matchData.b[matchData.currentCardB].Weapons[weaponChoice];
 
         if(damage > matchData.a[matchData.currentCardA].Hp){
@@ -151,12 +159,15 @@ export const battleActionListener = (matchData, socket, battleContract) => {
                       damage: damage,
                       type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
                       advantage: advantage,
-                      newCard: i
+                      newCard: i,
+                      nextTurn: matchData.b[matchData.currentCardB].nextTurn
                     });
                     return;
                 }
             }
             matchData.matchOver = true;
+            const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 1);
+            await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
             if (typeof cb == 'function') cb({
               death: true,
               end: true,
@@ -164,9 +175,10 @@ export const battleActionListener = (matchData, socket, battleContract) => {
               type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
               advantage: advantage
             });
-            const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 1);
-            await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
-        } else{
+            //socket.off('input');
+            socket.leave(matchData.room);
+            matchData = null;
+        } else {
             matchData.a[matchData.currentCardA].Hp = matchData.a[matchData.currentCardA].Hp - damage;
             if (typeof cb == 'function') cb({
               death: false,
@@ -174,26 +186,28 @@ export const battleActionListener = (matchData, socket, battleContract) => {
               damage: damage,
               type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
               advantage: advantage,
-              newCard: i
+              nextTurn: matchData.b[matchData.currentCardB].nextTurn
             });
         }
       }
     }
     if (data.action == 'swap') {
       if (data.newCard >= matchData.matchSize) return;
+      const currentCardA = matchData.currentCardA;
+      const currentCardB = matchData.currentCardB;
       if(account == matchData.a[0].Owner){
           if(data.newCard == matchData.currentCardA) return;
           if(matchData.a[data.newCard].Hp <= 0) return;
           matchData.currentCardA = data.newCard;
-          if(matchData.a[currentCardA].NextTurn < 8 + now){
-              matchData.a[currentCardA].NextTurn = 8*1000 + now;
+          if(matchData.a[currentCardA].nextTurn < 8*1000 + now){
+              matchData.a[currentCardA].nextTurn = 8*1000 + now;
           }
       }else if(account == matchData.b[0].Owner){
-        if(data.newCard == matchData.currentCardA) return;
+        if(data.newCard == matchData.currentCardB) return;
         if(matchData.b[data.newCard].Hp <= 0) return;
           matchData.currentCardB = data.newCard;
-          if(matchData.b[currentCardB].NextTurn < 8 + now) {
-              matchData.b[currentCardB].NextTurn = 8*1000 + now;
+          if(matchData.b[currentCardB].nextTurn < 8*1000 + now) {
+              matchData.b[currentCardB].nextTurn = 8*1000 + now;
           }
       }
       socket.broadcast.emit('swapCard', {
@@ -221,9 +235,9 @@ export const battleActionListener = (matchData, socket, battleContract) => {
       if(msg.sender == ownerA){
         if (matchData.a[currentCardA].Weapons[1] != 0) return;
         if (matchData.a[card].Hp <= 0) return;
-        if (matchData.a[currentCardA].NextTurn > now) return;
+        if (matchData.a[currentCardA].nextTurn > now) return;
 
-        let delta = (now - matchData.a[matchData.currentCardA].NextTurn)/1000;
+        let delta = (now - matchData.a[matchData.currentCardA].nextTurn)/1000;
 
         var currentCrit = 0.01 * Math.pow(1.0+(critCurve), delta);
         currentCrit = Math.min(0.33, currentCrit);
@@ -237,13 +251,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.a[card].Hp += healing;
         }
 
-        matchData.a[currentCardA].NextTurn = ((gameConstants.timer/_matchInfo[matchIndex].a[currentCardA].Spd) + 8)*1000 + now;
+        matchData.a[currentCardA].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].a[currentCardA].Spd) + 8)*1000 + now;
       }else{
         if (matchData.b[currentCardB].Weapons[1] != 0) return;
         if (matchData.b[card].Hp <= 0) return;
-        if (matchData.b[currentCardB].NextTurn > now) return;
+        if (matchData.b[currentCardB].nextTurn > now) return;
 
-        let delta = (now - matchData.b[matchData.currentCardB].NextTurn)/1000;
+        let delta = (now - matchData.b[matchData.currentCardB].nextTurn)/1000;
 
         var currentCrit = 0.01 * Math.pow(1.0+(critCurve), delta);
         currentCrit = Math.min(0.33, currentCrit);
@@ -257,7 +271,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.b[card].Hp += healing;
         }
 
-        matchData.b[currentCardA].NextTurn = ((gameConstants.timer/_matchInfo[matchIndex].b[currentCardB].Spd) + 8)*1000 + now;
+        matchData.b[currentCardA].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].b[currentCardB].Spd) + 8)*1000 + now;
       }
     }
   });
