@@ -165,6 +165,9 @@ const startBroadcast = (room) => {
                 socket.volatile.emit('update', time);
             })
             setTimeout(heartbeat, interval);
+        } else {
+          duelsByWallet[duelData[room].ownerA] = undefined;
+          duelsByWallet[duelData[room].ownerB] = undefined;
         }
     }
     return setTimeout(heartbeat, interval);

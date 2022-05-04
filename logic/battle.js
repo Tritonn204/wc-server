@@ -123,7 +123,6 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
             //socket.off('input');
             socket.leave(matchData.room);
-            matchData = null;
         } else{
             matchData.b[matchData.currentCardB].Hp = matchData.b[matchData.currentCardB].Hp - damage;
             if (typeof cb == 'function') cb({
@@ -203,7 +202,6 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
             //socket.off('input');
             socket.leave(matchData.room);
-            matchData = null;
         } else {
             matchData.a[matchData.currentCardA].Hp = matchData.a[matchData.currentCardA].Hp - damage;
             if (typeof cb == 'function') cb({
