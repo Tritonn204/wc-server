@@ -292,7 +292,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.a[card].Hp += healing;
         }
 
-        matchData.a[currentCardA].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].a[currentCardA].Spd) + 8)*1000 + now;
+        matchData.a[currentCardA].nextTurn = ((gameConstants.timer/matchData.a[currentCardA].Spd) + 8)*1000 + now;
 
         if (typeof cb == 'function') {
           cb({
@@ -327,7 +327,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.b[card].Hp += healing;
         }
 
-        matchData.b[currentCardB].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].b[currentCardB].Spd) + 8)*1000 + now;
+        matchData.b[currentCardB].nextTurn = ((gameConstants.timer/matchData.b[currentCardB].Spd) + 8)*1000 + now;
         if (typeof cb == 'function') {
           cb({
             card: card,
