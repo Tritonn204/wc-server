@@ -15,7 +15,7 @@ const http = require('http');
 const port = parseInt(process.env.PORT) || 4000;
 const server = http.createServer(expressApp);
 const socketIo = require('socket.io');
-const interval = 1000/4;
+const interval = 1000/20;
 
 server.listen(port);
 console.log(`Listening on port ${port}`);
@@ -162,7 +162,10 @@ const startBroadcast = (room) => {
 
             const clientList = await io.in(room).fetchSockets()
             clientList.forEach(socket => {
-                socket.volatile.emit('update', time);
+                socket.volatile.emit('update', {
+                  time: time,
+                  matchState: duelData[room]
+                });
             })
             setTimeout(heartbeat, interval);
         } else if (duelData[room]){
