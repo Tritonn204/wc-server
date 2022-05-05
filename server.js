@@ -163,7 +163,7 @@ const startBroadcast = (room) => {
         if (duelData[room] && duelData[room].matchClosed == undefined){
             if (duelData[room].matchOver == true) {
               var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
-              var symbol = query.Title;
+              var symbol = query.data().Title;
 
               await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
               duelData[room].matchClosed = true;
