@@ -100,6 +100,8 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   }
 
   duelData[currentIndex] = {
+    aName: recordA.name,
+    bName: recordB.name,
     a: A,
     b: B,
     eloA: recordA.elo.toNumber(),
@@ -107,6 +109,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     currentCardA: 0,
     currentCardB: 0,
     matchSize: matchSize,
+    matchType: matchInfo.matchType,
     startTime: startTime,
     matchOver: false,
     index: onChainIndex.toNumber()
@@ -155,7 +158,17 @@ io.on("connection", socket => {
 const startBroadcast = (room) => {
     const heartbeat = async () => {
         //Once match is cleared from memory, the loop will cease
-        if (duelData[room] && !duelData[room].matchOver){
+        if (duelData[room] && duelData[room].matchClosed == undefined){
+            if (duelData[room].matchOver == true) {
+              var totals = await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').get();
+
+              if (totals == undefined) totals = 0;
+              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc(`${totals}`).set(duelData[room]);
+
+              totals++;
+              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set(`${totals}`);
+              duelData[room].matchClosed = true;
+            }
             let pack = {};
 
             const time =  Date.now();
