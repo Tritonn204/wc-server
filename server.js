@@ -103,6 +103,8 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   duelData[currentIndex] = {
     aName: recordA.name,
     bName: recordB.name,
+    recordA: {wins: recordA.wins.toNumber(), losses: recordA.losses.toNumber()},
+    recordB: {wins: recordB.wins.toNumber(), losses: recordB.losses.toNumber()},
     a: A,
     b: B,
     eloA: recordA.elo.toNumber(),
@@ -157,6 +159,23 @@ io.on("connection", socket => {
   })
 });
 
+const addData = async (wins, losses, owner, name, elo) => {
+  var N;
+  if (name == '') {
+    N = owner.substring(0, 6) + "..." + owner.slice(-4);
+  } else {
+    N = name;
+  }
+  data = {
+    Wins: wins,
+    Losses: losses,
+    Wallet: owner,
+    Name: N,
+    Elo: elo
+  }
+  const res = await db.collection('Leaderboard').doc(owner.toString()).set(data);
+};
+
 const startBroadcast = (room) => {
     const heartbeat = async () => {
         //Once match is cleared from memory, the loop will cease
@@ -166,6 +185,8 @@ const startBroadcast = (room) => {
               var symbol = query.data().Title;
 
               await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
+              await addData(duelData[room].recordA.wins, duelData[room].recordA.losses, duelData[room].a[0].Owner, duelData[room].aName, duelData[room].newEloA);
+              await addData(duelData[room].recordB.wins, duelData[room].recordB.losses, duelData[room].b[0].Owner, duelData[room].bName, duelData[room].newEloB);
               duelData[room].matchClosed = true;
             }
             let pack = {};

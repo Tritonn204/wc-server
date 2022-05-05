@@ -104,8 +104,6 @@ export const battleActionListener = (matchData, socket, battleContract) => {
                     return;
                 }
             }
-            matchData.matchOver = true;
-            matchData.winner = 0;
             if (typeof cb == 'function') cb({
               death: true,
               end: true,
@@ -121,7 +119,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
               advantage: advantage
             });
             const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 0);
+            matchData.newEloA = eloCalc.winnerElo;
+            matchData.newEloB = eloCalc.loserElo;
+            matchData.recordA.wins++;
+            matchData.recordB.losses++;
             await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
+            matchData.matchOver = true;
+            matchData.winner = 0;
             //socket.off('input');
             socket.leave(matchData.room);
         } else{
@@ -184,8 +188,6 @@ export const battleActionListener = (matchData, socket, battleContract) => {
                     return;
                 }
             }
-            matchData.matchOver = true;
-            matchData.winner = 1;
             if (typeof cb == 'function') cb({
               death: true,
               end: true,
@@ -201,7 +203,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
               advantage: advantage
             });
             const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 1);
+            matchData.newEloB = eloCalc.winnerElo;
+            matchData.newEloA = eloCalc.loserElo;
+            matchData.recordB.wins++;
+            matchData.recordA.losses++;
             await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
+            matchData.matchOver = true;
+            matchData.winner = 1;
             //socket.off('input');
             socket.leave(matchData.room);
         } else {
