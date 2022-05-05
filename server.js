@@ -166,7 +166,7 @@ const addData = async (wins, losses, owner, name, elo) => {
   } else {
     N = name;
   }
-  data = {
+  var data = {
     Wins: wins,
     Losses: losses,
     Wallet: owner,
