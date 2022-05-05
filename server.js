@@ -67,6 +67,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
 
   const recordA = await duelContract.walletRecord(ownerA.toLowerCase());
   const recordB = await duelContract.walletRecord(ownerB.toLowerCase());
+  const currency = await duelContract.queueGlossary(matchInfo.matchType.toNumber());
 
   for(let i = 0; i < matchSize; i++) {
     const statsA = await db.collection('Stats').doc(`${matchInfo.a[i].toNumber()}`).get();
@@ -112,7 +113,8 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     matchType: matchInfo.matchType.toNumber(),
     startTime: startTime,
     matchOver: false,
-    index: onChainIndex.toNumber()
+    index: onChainIndex.toNumber(),
+    currency: currency.toLowerCase()
   };
 
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
@@ -160,16 +162,10 @@ const startBroadcast = (room) => {
         //Once match is cleared from memory, the loop will cease
         if (duelData[room] && duelData[room].matchClosed == undefined){
             if (duelData[room].matchOver == true) {
-              var query = await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').get();
-              var totals;
-              if (query == undefined) totals = 0;
-              else {
-                totals = query.value;
-              }
-              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc(`${totals}`).set(JSON.parse(JSON.stringify(duelData[room])));
+              var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
+              var symbol = query.Title;
 
-              totals++;
-              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set({value: totals});
+              await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
               duelData[room].matchClosed = true;
             }
             let pack = {};
