@@ -271,7 +271,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
       const card = data.card;
 
       if (card >= matchData.matchSize) return;
-      if (socket.userData.wallet != ownerA || socket.userData.wallet != ownerB) return;
+      if (socket.userData.wallet != ownerA && socket.userData.wallet != ownerB) return;
 
       if(msg.sender == ownerA){
         if (matchData.a[currentCardA].Weapons[1] != 0) return;
