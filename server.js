@@ -163,7 +163,7 @@ const startBroadcast = (room) => {
               var totals = await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').get();
 
               if (totals == undefined) totals = 0;
-              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc(`${totals}`).set(JSON.parse(JSON.stringify(duelData[room]));
+              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc(`${totals}`).set(JSON.parse(JSON.stringify(duelData[room])));
 
               totals++;
               await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set(`${totals}`);
