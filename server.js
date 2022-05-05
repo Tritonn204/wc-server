@@ -166,7 +166,7 @@ const startBroadcast = (room) => {
               await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc(`${totals}`).set(JSON.parse(JSON.stringify(duelData[room])));
 
               totals++;
-              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set(`${totals}`);
+              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set(totals.valueOf());
               duelData[room].matchClosed = true;
             }
             let pack = {};
