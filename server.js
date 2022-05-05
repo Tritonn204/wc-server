@@ -67,7 +67,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
 
   const recordA = await duelContract.walletRecord(ownerA.toLowerCase());
   const recordB = await duelContract.walletRecord(ownerB.toLowerCase());
-  const currency = await duelContract.queueGlossary(matchInfo.matchType.toNumber());
+  const glossary = await duelContract.queueGlossary(matchInfo.matchType.toNumber());
 
   for(let i = 0; i < matchSize; i++) {
     const statsA = await db.collection('Stats').doc(`${matchInfo.a[i].toNumber()}`).get();
@@ -114,7 +114,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     startTime: startTime,
     matchOver: false,
     index: onChainIndex.toNumber(),
-    currency: currency.toLowerCase()
+    currency: glossary.currency.toLowerCase()
   };
 
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
