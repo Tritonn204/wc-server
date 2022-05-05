@@ -109,7 +109,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     currentCardA: 0,
     currentCardB: 0,
     matchSize: matchSize,
-    matchType: matchInfo.matchType,
+    matchType: matchInfo.matchType.toNumber(),
     startTime: startTime,
     matchOver: false,
     index: onChainIndex.toNumber()
