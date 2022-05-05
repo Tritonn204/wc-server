@@ -160,13 +160,16 @@ const startBroadcast = (room) => {
         //Once match is cleared from memory, the loop will cease
         if (duelData[room] && duelData[room].matchClosed == undefined){
             if (duelData[room].matchOver == true) {
-              var totals = await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').get();
-
-              if (totals == undefined) totals = 0;
+              var query = await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').get();
+              var totals;
+              if (query == undefined) totals = 0;
+              else {
+                totals = query.value;
+              }
               await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc(`${totals}`).set(JSON.parse(JSON.stringify(duelData[room])));
 
               totals++;
-              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set(totals.valueOf());
+              await db.collection('MatchHistory').doc(`${duelData[room].matchType}`).collection('matchData').doc('count').set({value: totals});
               duelData[room].matchClosed = true;
             }
             let pack = {};
