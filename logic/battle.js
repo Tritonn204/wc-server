@@ -105,6 +105,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
                 }
             }
             matchData.matchOver = true;
+            matchData.winner = 0;
             if (typeof cb == 'function') cb({
               death: true,
               end: true,
@@ -184,6 +185,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
                 }
             }
             matchData.matchOver = true;
+            matchData.winner = 1;
             if (typeof cb == 'function') cb({
               death: true,
               end: true,
