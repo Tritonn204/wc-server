@@ -284,7 +284,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
         currentCrit = Math.min(0.33, currentCrit);
 
         const healing = (((matchData.a[currentCardA].Att+matchData.a[currentCardA].Def)/2)*healingBase)*(1 + currentCrit);
-        const cardMaxHp = matchData.a[currentCardA].MaxHP;
+        const cardMaxHp = matchData.a[card].MaxHP;
 
         if(matchData.a[card].Hp + healing > cardMaxHp){
             matchData.a[card].Hp = cardMaxHp;
@@ -319,7 +319,7 @@ export const battleActionListener = (matchData, socket, battleContract) => {
         currentCrit = Math.min(0.33, currentCrit);
 
         const healing = (((matchData.b[currentCardB].Att+matchData.b[currentCardB].Def)/2)*healingBase)*(1 + currentCrit);
-        const cardMaxHp = matchData.b[currentCardB].MaxHP;
+        const cardMaxHp = matchData.b[card].MaxHP;
 
         if(matchData.b[card].Hp + healing > cardMaxHp){
             matchData.b[card].Hp = cardMaxHp;
