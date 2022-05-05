@@ -301,13 +301,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             nextTurn: matchData.a[currentCardA].nextTurn
           })
         }
-        socket.broadcast.emit('healCard', {
+        socket.broadcast.emit('healCard',
           {
             card: card,
             healing: healing,
             nextTurn: matchData.a[currentCardA].nextTurn
-          })
-        })
+          }
+        )
       }else{
         if (matchData.b[currentCardB].Weapons[1] != 0) return;
         if (matchData.b[card].Hp <= 0) return;
@@ -335,13 +335,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             nextTurn: matchData.b[currentCardB].nextTurn
           })
         }
-        socket.broadcast.emit('healCard', {
+        socket.broadcast.emit('healCard',
           {
             card: card,
             healing: healing,
             nextTurn: matchData.b[currentCardB].nextTurn
-          })
-        })
+          }
+        )
       }
     }
   });
