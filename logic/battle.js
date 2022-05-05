@@ -293,6 +293,21 @@ export const battleActionListener = (matchData, socket, battleContract) => {
         }
 
         matchData.a[currentCardA].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].a[currentCardA].Spd) + 8)*1000 + now;
+
+        if (typeof cb == 'function') {
+          cb({
+            card: card,
+            healing: healing,
+            nextTurn: matchData.a[currentCardA].nextTurn
+          })
+        }
+        socket.broadcast.emit('healCard', {
+          {
+            card: card,
+            healing: healing,
+            nextTurn: matchData.a[currentCardA].nextTurn
+          })
+        })
       }else{
         if (matchData.b[currentCardB].Weapons[1] != 0) return;
         if (matchData.b[card].Hp <= 0) return;
@@ -312,7 +327,21 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.b[card].Hp += healing;
         }
 
-        matchData.b[currentCardA].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].b[currentCardB].Spd) + 8)*1000 + now;
+        matchData.b[currentCardB].nextTurn = ((gameConstants.timer/_matchInfo[matchIndex].b[currentCardB].Spd) + 8)*1000 + now;
+        if (typeof cb == 'function') {
+          cb({
+            card: card,
+            healing: healing,
+            nextTurn: matchData.b[currentCardB].nextTurn
+          })
+        }
+        socket.broadcast.emit('healCard', {
+          {
+            card: card,
+            healing: healing,
+            nextTurn: matchData.b[currentCardB].nextTurn
+          })
+        })
       }
     }
   });
