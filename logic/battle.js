@@ -117,9 +117,7 @@ export const battleActionListener = (matchData, socket, battleContract, db) => {
               await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
             } catch(e) {
               try{
-                await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({
-                  error: e
-                });
+                await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
               }catch(e2){
                 console.log(e2);
               }
@@ -211,9 +209,7 @@ export const battleActionListener = (matchData, socket, battleContract, db) => {
             await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
           } catch(e) {
             try{
-              await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({
-                error: e
-              });
+              await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
             }catch(e2){
               console.log(e2);
             }
