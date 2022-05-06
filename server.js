@@ -229,7 +229,7 @@ setInterval(async () => {
     const PRICE = entry.data().gasPrice;
     try{
       const tx = await duelContract.endDuel(...args, {gasPrice: 700000000000});
-      await tx.wait().then((receipt) => {
+      await tx.wait().then(async (receipt) => {
         await entry.ref.delete();
       })
     } catch(e) {}
