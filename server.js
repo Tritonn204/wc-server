@@ -199,8 +199,8 @@ const startBroadcast = (room) => {
               } catch(e) {
                 console.log(e);
               }
+              duelData[room].matchClosed = true;
             }
-            duelData[room].matchClosed = true;
             let pack = {};
 
             const time =  Date.now();
