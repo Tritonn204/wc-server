@@ -7,7 +7,7 @@ const DamageMultArray3 = [4,1,4,2];
 export const multArray = [DamageMultArray0,DamageMultArray1,DamageMultArray2,DamageMultArray3];
 
 const damageBase = 1250;
-const healingBase = 10;
+const healingBase = 1;
 const critCurve = 0.8;
 const crit = 0.33;
 
@@ -161,85 +161,85 @@ export const battleActionListener = (matchData, socket, battleContract, db) => {
         matchData.b[matchData.currentCardB].Type = matchData.b[matchData.currentCardB].Weapons[weaponChoice];
 
         if(damage > matchData.a[matchData.currentCardA].Hp){
-            matchData.a[matchData.currentCardA].Hp = 0;
-            for (let i = 0; i < matchData.matchSize; i++) {
-                if(matchData.a[i].Hp <= 0){
-                    continue;
-                }else{
-                    matchData.currentCardA = i;
-                    if (typeof cb == 'function') cb({
-                      death: true,
-                      end: false,
-                      damage: damage,
-                      type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
-                      advantage: advantage,
-                      newCard: i,
-                      nextTurn: matchData.b[matchData.currentCardB].nextTurn
-                    });
-                    socket.broadcast.emit('showAttack', {
-                      death: true,
-                      end: false,
-                      damage: damage,
-                      type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
-                      advantage: advantage,
-                      newCard: i,
-                      nextTurn: matchData.b[matchData.currentCardB].nextTurn
-                    });
-                    return;
-                }
-            }
-            if (typeof cb == 'function') cb({
-              death: true,
-              end: true,
-              damage: damage,
-              type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
-              advantage: advantage
-            });
-            socket.broadcast.emit('showAttack', {
-              death: true,
-              end: true,
-              damage: damage,
-              type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
-              advantage: advantage
-            });
-            const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 1);
-            matchData.newEloB = eloCalc.winnerElo;
-            matchData.newEloA = eloCalc.loserElo;
-            matchData.recordB.wins++;
-            matchData.recordA.losses++;
-            try {
-              await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
-            } catch(e) {
-              try{
-                await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({
-                  error: e
-                });
-              }catch(e2){
-                console.log(e2);
+          matchData.a[matchData.currentCardA].Hp = 0;
+          for (let i = 0; i < matchData.matchSize; i++) {
+              if(matchData.a[i].Hp <= 0){
+                  continue;
+              }else{
+                  matchData.currentCardA = i;
+                  if (typeof cb == 'function') cb({
+                    death: true,
+                    end: false,
+                    damage: damage,
+                    type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
+                    advantage: advantage,
+                    newCard: i,
+                    nextTurn: matchData.b[matchData.currentCardB].nextTurn
+                  });
+                  socket.broadcast.emit('showAttack', {
+                    death: true,
+                    end: false,
+                    damage: damage,
+                    type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
+                    advantage: advantage,
+                    newCard: i,
+                    nextTurn: matchData.b[matchData.currentCardB].nextTurn
+                  });
+                  return;
               }
+          }
+          if (typeof cb == 'function') cb({
+            death: true,
+            end: true,
+            damage: damage,
+            type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
+            advantage: advantage
+          });
+          socket.broadcast.emit('showAttack', {
+            death: true,
+            end: true,
+            damage: damage,
+            type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
+            advantage: advantage
+          });
+          const eloCalc = calculateElo(matchData.eloA, matchData.eloB, 1);
+          matchData.newEloB = eloCalc.winnerElo;
+          matchData.newEloA = eloCalc.loserElo;
+          matchData.recordB.wins++;
+          matchData.recordA.losses++;
+          try {
+            await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
+          } catch(e) {
+            try{
+              await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({
+                error: e
+              });
+            }catch(e2){
+              console.log(e2);
             }
-            matchData.matchOver = true;
-            matchData.winner = 1;
-            //socket.off('input');
-            socket.leave(matchData.room);
+          }
+          matchData.matchOver = true;
+          matchData.winner = 1;
+          //socket.off('input');
+          socket.leave(matchData.room);
         } else {
-            matchData.a[matchData.currentCardA].Hp = matchData.a[matchData.currentCardA].Hp - damage;
-            if (typeof cb == 'function') cb({
-              death: false,
-              end: false,
-              damage: damage,
-              type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
-              advantage: advantage,
-              nextTurn: matchData.b[matchData.currentCardB].nextTurn
-            });
-            socket.broadcast.emit('showAttack', {
-              death: false,
-              end: false,
-              damage: damage,
-              type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
-              advantage: advantage,
-              nextTurn: matchData.b[matchData.currentCardB].nextTurn
-            });
+          matchData.a[matchData.currentCardA].Hp = matchData.a[matchData.currentCardA].Hp - damage;
+          if (typeof cb == 'function') cb({
+            death: false,
+            end: false,
+            damage: damage,
+            type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
+            advantage: advantage,
+            nextTurn: matchData.b[matchData.currentCardB].nextTurn
+          });
+          socket.broadcast.emit('showAttack', {
+            death: false,
+            end: false,
+            damage: damage,
+            type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
+            advantage: advantage,
+            nextTurn: matchData.b[matchData.currentCardB].nextTurn
+          });
         }
       }
     }
