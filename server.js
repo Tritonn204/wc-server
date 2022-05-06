@@ -105,6 +105,8 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     bName: recordB.name,
     recordA: {wins: recordA.wins.toNumber(), losses: recordA.losses.toNumber()},
     recordB: {wins: recordB.wins.toNumber(), losses: recordB.losses.toNumber()},
+    nextSwapA: startTime,
+    nextSwapB: startTime,
     a: A,
     b: B,
     eloA: recordA.elo.toNumber(),
@@ -183,6 +185,11 @@ const startBroadcast = (room) => {
             if (duelData[room].matchOver == true) {
               var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
               var symbol = query.data().Title;
+
+              const query2 = db.collection(`MatchHistory_${symbol}`).doc(`Index`);
+              query2.update({
+                list: firebase.firestore.FieldValue.arrayUnion(`${duelData[room].index}`);
+              });
 
               await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
               await addData(duelData[room].recordA.wins, duelData[room].recordA.losses, duelData[room].a[0].Owner, duelData[room].aName, duelData[room].newEloA);

@@ -241,26 +241,31 @@ export const battleActionListener = (matchData, socket, battleContract) => {
       var newNextTurn;
 
       if(account == matchData.a[0].Owner){
-          if(data.newCard == matchData.currentCardA) return;
-          if(matchData.a[data.newCard].Hp <= 0) return;
-          matchData.currentCardA = data.newCard;
-          if(matchData.a[data.newCard].nextTurn < 8*1000 + now){
-            newNextTurn = 8*1000 + now;
-            matchData.a[data.newCard].nextTurn = newNextTurn;
-          } else {
-            newNextTurn = matchData.a[data.newCard].nextTurn;
-          }
+        if(data.newCard == matchData.currentCardA) return;
+        if(matchData.a[data.newCard].Hp <= 0) return;
+        if(now < matchData.nextSwapA) return;
+        matchData.currentCardA = data.newCard;
+        matchData.nextSwapA += 5000;
+        if(matchData.a[data.newCard].nextTurn < 8*1000 + now){
+          newNextTurn = 8*1000 + now;
+          matchData.a[data.newCard].nextTurn = newNextTurn;
+        } else {
+          newNextTurn = matchData.a[data.newCard].nextTurn;
+        }
       }else if(account == matchData.b[0].Owner){
         if(data.newCard == matchData.currentCardB) return;
+        if(now < matchData.nextSwapB) return;
         if(matchData.b[data.newCard].Hp <= 0) return;
-          matchData.currentCardB = data.newCard;
-          if(matchData.b[data.newCard].nextTurn < 8*1000 + now) {
-            newNextTurn = 8*1000 + now;
-            matchData.b[data.newCard].nextTurn = newNextTurn;
-          } else {
-            newNextTurn = matchData.b[data.newCard].nextTurn;
-          }
+        matchData.currentCardB = data.newCard;
+        matchData.nextSwapB += 5000;
+        if(matchData.b[data.newCard].nextTurn < 8*1000 + now) {
+          newNextTurn = 8*1000 + now;
+          matchData.b[data.newCard].nextTurn = newNextTurn;
+        } else {
+          newNextTurn = matchData.b[data.newCard].nextTurn;
+        }
       }
+
       socket.broadcast.emit('swapCard', {
         user: account,
         newCard: data.newCard,
