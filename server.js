@@ -139,10 +139,9 @@ io.on("connection", socket => {
   socket.userData = {};
 
   socket.on('setWallet', async (data) => {
-    socket.userData = {};
     let sig = ethers.utils.splitSignature(data.signature);
     let recovered = await verifier.verifyString(data.message, sig.v, sig.r, sig.s);
-    socket.userData.wallet = recovered.toLowerCase();
+    socket.userData = {wallet: recovered.toLowerCase()};
   });
 
   socket.on('sendEmote', e => {
