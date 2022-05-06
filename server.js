@@ -227,9 +227,7 @@ setInterval(async () => {
     const ARGS = entry.data().args;
     try{
       const tx = await duelContract.endDuel(ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-      tx.wait().then(async () => {
-        await entry.delete();
-      });
+      await entry.delete();
     } catch(e) {}
   })
 }, retryInterval)
