@@ -123,7 +123,11 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.newEloB = eloCalc.loserElo;
             matchData.recordA.wins++;
             matchData.recordB.losses++;
-            await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
+            try {
+              await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
+            } catch(e) {
+              console.log(e);
+            }
             matchData.matchOver = true;
             matchData.winner = 0;
             //socket.off('input');
@@ -207,7 +211,11 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             matchData.newEloA = eloCalc.loserElo;
             matchData.recordB.wins++;
             matchData.recordA.losses++;
-            await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
+            try {
+              await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
+            } catch(e) {
+              console.log(e);
+            }
             matchData.matchOver = true;
             matchData.winner = 1;
             //socket.off('input');

@@ -183,19 +183,23 @@ const startBroadcast = (room) => {
         //Once match is cleared from memory, the loop will cease
         if (duelData[room] && duelData[room].matchClosed == undefined){
             if (duelData[room].matchOver == true) {
-              var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
-              var symbol = query.data().Title;
+              try {
+                var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
+                var symbol = query.data().Title;
+  
+                const query2 = db.collection(`MatchHistory_${symbol}`).doc(`Index`);
+                query2.update({
+                  list: admin.firestore.FieldValue.arrayUnion(`${duelData[room].index}`)
+                });
 
-              const query2 = db.collection(`MatchHistory_${symbol}`).doc(`Index`);
-              query2.update({
-                list: admin.firestore.FieldValue.arrayUnion(`${duelData[room].index}`)
-              });
-
-              await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
-              await addData(duelData[room].recordA.wins, duelData[room].recordA.losses, duelData[room].a[0].Owner, duelData[room].aName, duelData[room].newEloA);
-              await addData(duelData[room].recordB.wins, duelData[room].recordB.losses, duelData[room].b[0].Owner, duelData[room].bName, duelData[room].newEloB);
-              duelData[room].matchClosed = true;
+                await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
+                await addData(duelData[room].recordA.wins, duelData[room].recordA.losses, duelData[room].a[0].Owner, duelData[room].aName, duelData[room].newEloA);
+                await addData(duelData[room].recordB.wins, duelData[room].recordB.losses, duelData[room].b[0].Owner, duelData[room].bName, duelData[room].newEloB);
+              } catch(e) {
+                console.log(e);
+              }
             }
+            duelData[room].matchClosed = true;
             let pack = {};
 
             const time =  Date.now();
