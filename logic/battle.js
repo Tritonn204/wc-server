@@ -251,7 +251,7 @@ export const battleActionListener = (matchData, socket, battleContract, db) => {
         if(matchData.a[data.newCard].Hp <= 0) return;
         if(now < matchData.nextSwapA) return;
         matchData.currentCardA = data.newCard;
-        matchData.nextSwapA += 5000;
+        matchData.nextSwapA += 5000 + now;
         if(matchData.a[data.newCard].nextTurn < 5*1000 + now){
           newNextTurn = 5*1000 + now;
           matchData.a[data.newCard].nextTurn = newNextTurn;
@@ -263,7 +263,7 @@ export const battleActionListener = (matchData, socket, battleContract, db) => {
         if(now < matchData.nextSwapB) return;
         if(matchData.b[data.newCard].Hp <= 0) return;
         matchData.currentCardB = data.newCard;
-        matchData.nextSwapB += 5000;
+        matchData.nextSwapB = 5000 + now;
         if(matchData.b[data.newCard].nextTurn < 5*1000 + now) {
           newNextTurn = 5*1000 + now;
           matchData.b[data.newCard].nextTurn = newNextTurn;
