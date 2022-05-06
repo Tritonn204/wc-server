@@ -29,7 +29,7 @@ const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
 
 const verifier = new ethers.Contract(envs.TESTVERIFIER, verifierABI, wallet);
-const duelContract = new ethers.Contract('0x61F814104Ea8cC6968aC643E8B05358A24bFf516', duelABI, wallet);
+const duelContract = new ethers.Contract('0xb838Aa281B3528db4BEA1D3C136e0003f47f9714', duelABI, wallet);
 const nftContract = new ethers.Contract('0x340B62591a489CDe3906690e59a3b4D154024B32', nftABI, wallet);
 
 const admin = require('firebase-admin');
@@ -151,7 +151,7 @@ io.on("connection", socket => {
     if (duelByWallet[socket.userData.wallet] != undefined && duelData[duelByWallet[socket.userData.wallet]] != undefined) {
       console.log('found');
       socket.join(duelByWallet[socket.userData.wallet]);
-      battleLogic.battleActionListener(duelData[duelByWallet[socket.userData.wallet]] ,socket, duelContract);
+      battleLogic.battleActionListener(duelData[duelByWallet[socket.userData.wallet]] ,socket, duelContract, db);
       if (typeof cb == 'function') cb(duelData[duelByWallet[socket.userData.wallet]]);
     }
   });
@@ -186,7 +186,7 @@ const startBroadcast = (room) => {
               try {
                 var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
                 var symbol = query.data().Title;
-  
+
                 const query2 = db.collection(`MatchHistory_${symbol}`).doc(`Index`);
                 query2.update({
                   list: admin.firestore.FieldValue.arrayUnion(`${duelData[room].index}`)

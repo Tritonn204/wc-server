@@ -55,7 +55,7 @@ export const calculateElo = (eloA, eloB, winner) => {
   return {winnerElo: Math.round(winnerElo), loserElo: Math.round(loserElo)};
 }
 
-export const battleActionListener = (matchData, socket, battleContract) => {
+export const battleActionListener = (matchData, socket, battleContract, db) => {
   if (!matchData) return;
   if (Object.keys(matchData).length < 1) return;
   const account = socket.userData.wallet;
@@ -126,7 +126,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             try {
               await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo);
             } catch(e) {
-              console.log(e);
+              try{
+                await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({
+                  error: e
+                });
+              }catch(e2){
+                console.log(e2);
+              }
             }
             matchData.matchOver = true;
             matchData.winner = 0;
@@ -214,7 +220,13 @@ export const battleActionListener = (matchData, socket, battleContract) => {
             try {
               await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo);
             } catch(e) {
-              console.log(e);
+              try{
+                await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({
+                  error: e
+                });
+              }catch(e2){
+                console.log(e2);
+              }
             }
             matchData.matchOver = true;
             matchData.winner = 1;
