@@ -226,7 +226,7 @@ setInterval(async () => {
   query.forEach(async (entry) => {
     const ARGS = entry.data().args;
     try{
-      const tx = await duelContract.endDuel(ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+      const tx = await duelContract.endDuel(ARGS[0], ARGS[1], ARGS[2], ARGS[3], {gasPrice: 700});
       await entry.delete();
     } catch(e) {}
   })
