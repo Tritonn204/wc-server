@@ -16,6 +16,7 @@ const port = parseInt(process.env.PORT) || 4000;
 const server = http.createServer(expressApp);
 const socketIo = require('socket.io');
 const interval = 1000/20;
+const retryInterval = 60000;
 
 server.listen(port);
 console.log(`Listening on port ${port}`);
@@ -219,3 +220,16 @@ const startBroadcast = (room) => {
     }
     return setTimeout(heartbeat, interval);
 }
+
+setInterval(() => {
+  const query = await db.collection(`UnendedMatches`).get();
+  query.forEach((entry) => {
+    const ARGS = entry.data().args;
+    try{
+      const tx = await duelContract.endDuel(ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+      tx.wait().then(() => {
+        await entry.delete();
+      });
+    } catch(e) {}
+  })
+}, retryInterval)

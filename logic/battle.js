@@ -118,6 +118,9 @@ export const battleActionListener = (matchData, socket, battleContract, db) => {
             } catch(e) {
               try{
                 await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
+                await db.collection(`UnendedMatches`).doc(`${matchData.index}`).set({
+                  args: [matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo]
+                });
               }catch(e2){
                 console.log(e2);
               }
