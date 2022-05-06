@@ -48,6 +48,7 @@ let duelIndex = 0;
 const duelByWallet = {};
 
 duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
+  console.log('duel started');
   const currentIndex = duelIndex.valueOf();
   duelIndex++;
 
