@@ -28,8 +28,8 @@ const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
 
 const verifier = new ethers.Contract(envs.VERIFIER, verifierABI, wallet);
-const duelContract = new ethers.Contract('0xb838Aa281B3528db4BEA1D3C136e0003f47f9714', duelABI, wallet);
-const nftContract = new ethers.Contract('0xC031b7793F17100e9B7Ad369cA05e5ec8A0F5B5C', nftABI, wallet);
+const duelContract = new ethers.Contract(envs.DUELCONTRACT, duelABI, wallet);
+const nftContract = new ethers.Contract(envs.NFTCONTRACT, nftABI, wallet);
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./wcgame-firebase-key');
