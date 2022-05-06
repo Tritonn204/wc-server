@@ -20,17 +20,16 @@ const interval = 1000/20;
 server.listen(port);
 console.log(`Listening on port ${port}`);
 
-const url = 'https://rpc.testnet.fantom.network/';
-const ftmProvider = new ethers.providers.JsonRpcProvider(url);
+const ftmProvider = new ethers.providers.JsonRpcProvider(envs.RPCURL);
 const wallet = new ethers.Wallet(envs.PRIVKEY, ftmProvider);
 
 const verifierABI = require('./contractABIs/verifier.json');
 const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
 
-const verifier = new ethers.Contract(envs.TESTVERIFIER, verifierABI, wallet);
+const verifier = new ethers.Contract(envs.VERIFIER, verifierABI, wallet);
 const duelContract = new ethers.Contract('0xb838Aa281B3528db4BEA1D3C136e0003f47f9714', duelABI, wallet);
-const nftContract = new ethers.Contract('0x340B62591a489CDe3906690e59a3b4D154024B32', nftABI, wallet);
+const nftContract = new ethers.Contract('0xC031b7793F17100e9B7Ad369cA05e5ec8A0F5B5C', nftABI, wallet);
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./wcgame-firebase-key');
