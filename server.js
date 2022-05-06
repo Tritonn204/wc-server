@@ -188,7 +188,7 @@ const startBroadcast = (room) => {
 
               const query2 = db.collection(`MatchHistory_${symbol}`).doc(`Index`);
               query2.update({
-                list: firebase.firestore.FieldValue.arrayUnion(`${duelData[room].index}`);
+                list: firebase.firestore.FieldValue.arrayUnion(`${duelData[room].index}`)
               });
 
               await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
