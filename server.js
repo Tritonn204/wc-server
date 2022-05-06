@@ -223,11 +223,14 @@ const startBroadcast = (room) => {
 
 setInterval(async () => {
   const query = await db.collection(`UnendedMatches`).get();
+  console.log('attempt');
   query.forEach(async (entry) => {
     const ARGS = entry.data().args;
     try{
       const tx = await duelContract.endDuel(ARGS[0], ARGS[1], ARGS[2], ARGS[3], {gasPrice: 700});
       await entry.delete();
-    } catch(e) {}
+    } catch(e) {
+      console.log(e);
+    }
   })
 }, retryInterval)
