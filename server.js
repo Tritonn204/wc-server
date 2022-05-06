@@ -226,9 +226,12 @@ setInterval(async () => {
   const query = await db.collection(`UnendedMatches`).get();
   query.forEach(async (entry) => {
     const ARGS = entry.data().args;
+    const PRICE = entry.data().gasPrice;
     try{
-      const tx = await duelContract.endDuel(ARGS[0], ARGS[1], ARGS[2], ARGS[3], {gasPrice: 700000000000});
-      await entry.ref.delete();
+      const tx = await duelContract.endDuel(...args, {gasPrice: 700000000000});
+      await tx.wait().then((receipt) => {
+        await entry.ref.delete();
+      })
     } catch(e) {}
   })
 }, retryInterval)
