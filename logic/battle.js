@@ -15,41 +15,31 @@ export const calculateElo = (eloA, eloB, winner) => {
   var winnerElo;
   var loserElo;
 
-  if (winner == 0) {
-    winnerElo = eloA;
-    loserElo = eloB;
+  if(eloA == 0){
+      eloA = 1000;
+  }
+  if(eloB == 0){
+      eloB = 1000;
+  }
+
+  var R1 = Math.pow(10,eloA/400);
+  var R2 = Math.pow(10,eloB/400);
+
+  var E1 = R1 / (R1 + R2);
+  var E2 = R2 / (R1 + R2);
+
+  if(winner == 0){
+    const Elo1 = eloA + (42 * (1 - E1));
+    const Elo2 = eloB + (42 * (0 - E2));
+
+    winnerElo = Elo1;
+    loserElo = Elo2;
   } else {
-    winnerElo = eloB;
-    loserElo = eloA;
-  }
+    const Elo1 = eloA + (42 * (0 - E1));
+    const Elo2 = eloB + (42 * (1 - E2));
 
-  if(winnerElo == 0){
-      winnerElo = 1000;
-  }
-  if(loserElo == 0){
-      loserRecord = 1000;
-  }
-
-  if(winnerElo > loserElo){
-      const Elo1 = winnerElo;
-      const Elo2 = loserElo;
-
-      const Ex1 = ((Elo1**7)*100)/((Elo1**7)+(Elo2**7));
-
-      const newElo = ((100-Ex1)*42)/100;
-
-      winnerElo = Elo1 + newElo;
-      loserElo = Elo2 - newElo;
-  }else{
-      const Elo1 = loserElo;
-      const Elo2 = winnerElo;
-
-      const Ex1 = ((Elo2**7)*100)/((Elo1**7)+(Elo2**7));
-
-      const newElo = ((100-Ex1)*42)/100;
-
-      winnerElo = Elo2 + newElo;
-      loserElo = Elo1 - newElo;
+    winnerElo = Elo2;
+    loserElo = Elo1;
   }
 
   return {winnerElo: Math.round(winnerElo), loserElo: Math.round(loserElo)};
