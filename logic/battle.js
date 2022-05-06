@@ -7,7 +7,7 @@ const DamageMultArray3 = [4,1,4,2];
 export const multArray = [DamageMultArray0,DamageMultArray1,DamageMultArray2,DamageMultArray3];
 
 const damageBase = 1250;
-const healingBase = 1;
+const healingBase = 2;
 const critCurve = 0.8;
 const crit = 0.33;
 
