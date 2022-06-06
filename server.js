@@ -47,6 +47,12 @@ const duelData = [];
 let duelIndex = 0;
 const duelByWallet = {};
 
+var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatches').get();
+stuckMatches.forEach((match, i) => {
+  console.log(match.data());
+});
+
+
 duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   console.log('duel started');
   const currentIndex = duelIndex.valueOf();
@@ -98,7 +104,6 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
       nextTurn: ((gameConstants.timer/statsB.data().SPD) + 8)*1000 + startTime,
       room: currentIndex
     });
-    startBroadcast(currentIndex);
   }
 
   duelData[currentIndex] = {
@@ -121,6 +126,14 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
     index: onChainIndex.toNumber(),
     currency: glossary.currency.toLowerCase()
   };
+
+  startBroadcast(currentIndex);
+
+  const dbRef = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
+  // Atomically add a new region to the "regions" array field.
+  var arrUnion = dbRef.update({
+    regions: admin.firestore.FieldValue.arrayUnion(onChainIndex.toNumber())
+  });
 
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
 });
@@ -186,6 +199,11 @@ const startBroadcast = (room) => {
         //Once match is cleared from memory, the loop will cease
         if (duelData[room] && duelData[room].matchClosed == undefined){
             if (duelData[room].matchOver == true) {
+              const dbRef = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
+              // Atomically remove a region from the "regions" array field.
+              var arrRm = dbRef.update({
+                regions: admin.firestore.FieldValue.arrayRemove(duelData[room].index);
+              });
               try {
                 var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
                 var symbol = query.data().Title;
