@@ -202,7 +202,7 @@ const startBroadcast = (room) => {
               const dbRef = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
               // Atomically remove a region from the "regions" array field.
               var arrRm = dbRef.update({
-                regions: admin.firestore.FieldValue.arrayRemove(duelData[room].index);
+                regions: admin.firestore.FieldValue.arrayRemove(duelData[room].index)
               });
               try {
                 var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
