@@ -128,7 +128,8 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
 const io = new socketIo.Server(server, {
   cors: {
     origin: [
-      "https://weaponizedcountriesnft.com"
+      "https://weaponizedcountriesnft.com",
+      "http://localhost:3000"
     ],
     methods: ["GET", "POST"],
     credentials: true
