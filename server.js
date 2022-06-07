@@ -47,11 +47,13 @@ const duelData = [];
 let duelIndex = 0;
 const duelByWallet = {};
 
-var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatches').get();
-stuckMatches.forEach((match, i) => {
-  console.log(match.data());
-});
-
+var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
+var SMDATA = stuckMatches;
+if (SMDATA != undefined) {
+  // SMDATA.forEach((match, i) => {
+  //   console.log(match.data());
+  // });
+}
 
 duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   console.log('duel started');
@@ -132,7 +134,7 @@ duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
   const dbRef = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
   // Atomically add a new region to the "regions" array field.
   var arrUnion = dbRef.update({
-    regions: admin.firestore.FieldValue.arrayUnion(onChainIndex.toNumber())
+    list: admin.firestore.FieldValue.arrayUnion(onChainIndex.toNumber())
   });
 
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
@@ -202,7 +204,7 @@ const startBroadcast = (room) => {
               const dbRef = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
               // Atomically remove a region from the "regions" array field.
               var arrRm = dbRef.update({
-                regions: admin.firestore.FieldValue.arrayRemove(duelData[room].index)
+                list: admin.firestore.FieldValue.arrayRemove(duelData[room].index)
               });
               try {
                 var query = await db.collection('MatchTypes3').doc(`${duelData[room].currency}`).get();
