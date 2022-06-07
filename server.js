@@ -47,12 +47,12 @@ const duelData = [];
 let duelIndex = 0;
 const duelByWallet = {};
 
-var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatches');
-var SMDATA = stuckMatches;
+var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatches').get();
+var SMDATA = stuckMatches.data().list;
 if (SMDATA != undefined) {
-  // SMDATA.forEach((match, i) => {
-  //   console.log(match.data());
-  // });
+  SMDATA.forEach((match, i) => {
+    console.log(match.data());
+  });
 }
 
 duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
