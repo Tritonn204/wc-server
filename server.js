@@ -51,7 +51,10 @@ var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatche
 var SMDATA = stuckMatches.data().list;
 if (SMDATA != undefined) {
   SMDATA.forEach((match, i) => {
-    console.log(match.data());
+    const query2 = db.collection(`PersistentMatchData`).doc(`OngoingMatches`);
+    query2.update({
+      list: admin.firestore.FieldValue.arrayUnion(match)
+    });
   });
 }
 
