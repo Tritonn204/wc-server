@@ -70,7 +70,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
             block: true
           });
           socket.broadcast.emit('showAttack', {
-            death: true,
+            death: false,
             end: false,
             damage: 0,
             type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
@@ -226,7 +226,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
             block: true
           });
           socket.broadcast.emit('showAttack', {
-            death: true,
+            death: false,
             end: false,
             damage: 0,
             type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
@@ -502,16 +502,17 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     var effectorB = matchData.powersB[data.choice];
 
     if (account == ownerA) {
-      if (!matchData.usedA){
+      if (matchData.usedA == false){
         matchData.statusA = effectorA;
         matchData.burnItemA = effectorA;
         matchData.usedA = true;
+        console.log(matchData);
         if (typeof cb == 'function') {
           cb({
             power: effectorA
           })
         }
-        socket.broadcast.emit('healCard',
+        socket.broadcast.emit('power',
         {
           power: effectorA
         })
@@ -519,16 +520,18 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     }
 
     if (account == ownerB) {
-      if (!matchData.usedB){
+      if (matchData.usedB == false){
         matchData.statusB = effectorB;
         matchData.burnItemB = effectorB;
         matchData.usedB = true;
+
+        console.log(matchData);
         if (typeof cb == 'function') {
           cb({
             power: effectorB
           })
         }
-        socket.broadcast.emit('healCard',
+        socket.broadcast.emit('power',
         {
           power: effectorB
         })
