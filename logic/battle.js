@@ -518,8 +518,9 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
               power: effectorA
             }
           })
-        }
+        })
       }
+    }
 
       if (account == ownerB) {
         if (!matchData.usedB){
@@ -537,7 +538,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
               power: effectorB
             }
           })
-        }
+        })
       }
     }
   });
