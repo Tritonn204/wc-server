@@ -322,9 +322,10 @@ setInterval(async () => {
     const ARGS = entry.data().args;
     const PRICE = entry.data().gasPrice;
     try{
-      const tx = await duelContract.endDuel(...args, {gasPrice: 700000000000});
-      await tx.wait();
-      await entry.ref.delete();
+      const tx = await duelContract.endDuel(JSON.parse(...ARGS), {gasPrice: 700000000000});
+      tx.wait().then(async() => {
+        await entry.ref.delete();
+      });
     } catch(e) {}
   })
 }, retryInterval)
