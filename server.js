@@ -155,9 +155,7 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
 });
 
-const getEquip = async (tokenId) => {
-  const equippedItem = (await itemContract._equipped(tokenId)).toNumber();
-  console.log(equippedItem);
+const getEquip = async (equippedItem) => {
   var result = [0,0,0];
     switch(equippedItem) {
       case 5:
