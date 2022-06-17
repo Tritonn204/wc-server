@@ -65,7 +65,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
             damage: 0,
             type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
             advantage: advantage,
-            newCard: i,
+            newCard: 0,
             nextTurn: matchData.a[matchData.currentCardA].nextTurn,
             block: true
           });
@@ -75,7 +75,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
             damage: 0,
             type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
             advantage: advantage,
-            newCard: i,
+            newCard: 0,
             nextTurn: matchData.a[matchData.currentCardA].nextTurn,
             block: true
           });
@@ -112,7 +112,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
               damage: damage,
               type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
               advantage: advantage,
-              newCard: i,
+              newCard: 0,
               nextTurn: matchData.a[matchData.currentCardA].nextTurn,
               revive: true
             });
@@ -122,7 +122,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
               damage: damage,
               type: matchData.a[matchData.currentCardA].Weapons[weaponChoice],
               advantage: advantage,
-              newCard: i,
+              newCard: 0,
               nextTurn: matchData.a[matchData.currentCardA].nextTurn,
               revive: true
             });
@@ -268,7 +268,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
               damage: damage,
               type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
               advantage: advantage,
-              newCard: i,
+              newCard: 0,
               nextTurn: matchData.b[matchData.currentCardB].nextTurn,
               revive: true
             });
@@ -278,7 +278,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
               damage: damage,
               type: matchData.b[matchData.currentCardB].Weapons[weaponChoice],
               advantage: advantage,
-              newCard: i,
+              newCard: 0,
               nextTurn: matchData.b[matchData.currentCardB].nextTurn,
               revive: true
             });
