@@ -504,7 +504,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     if (account == ownerA) {
       const tx = await backpackContract.usePotion(ownerA, data.choice);
       if (!matchData.usedA){
-        tx.wait.then(() => {
+        tx.wait().then(() => {
           matchData.statusA = effectorA;
           matchData.usedA = true;
           if (typeof cb == 'function') {
@@ -523,7 +523,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     if (account == ownerB) {
       if (!matchData.usedB){
         const tx = await backpackContract.usePotion(ownerB, data.choice);
-        tx.wait.then(() => {
+        tx.wait().then(() => {
           matchData.statusB = effectorB;
           matchData.usedB = true;
           if (typeof cb == 'function') {
