@@ -98,12 +98,14 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
     const tempA = await backpackContract._userItems(ownerA.toLowerCase());
     const tempB = await backpackContract._userItems(ownerB.toLowerCase());
 
+    const packSize = await backpackContract._size().toNumber();
+
     var powersA = [];
     var powersB = [];
 
-    for(let i = 0; i < tempA.length; i++) {
-      powersA.push(tempA[i].toNumber());
-      powersB.push(tempB[i].toNumber());
+    for(let i = 0; i < packSize; i++) {
+      powersA.push((await backpackContract._userItems(ownerA))[i].toNumber());
+      powersB.push((await backpackContract._userItems(ownerB))[i].toNumber());
     }
 
     A.push({
