@@ -21,7 +21,9 @@ const retryInterval = 60000;
 server.listen(port);
 console.log(`Listening on port ${port}`);
 
-const ftmProvider = new ethers.providers.JsonRpcProvider(envs.RPCURL);
+const ftmProvider = new ethers.providers.JsonRpcProvider(envs.RPCURLMAIN);
+const ftmProviderTest = new ethers.providers.JsonRpcProvider(envs.RPCURL);
+const walletTest = new ethers.Wallet(envs.PRIVKEY, ftmProviderTest);
 const wallet = new ethers.Wallet(envs.PRIVKEY, ftmProvider);
 
 const verifierABI = require('./contractABIs/verifier.json');
@@ -29,8 +31,8 @@ const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
 
 const verifier = new ethers.Contract(envs.VERIFIER, verifierABI, wallet);
-const duelContract = new ethers.Contract(envs.DUELCONTRACT, duelABI, wallet);
-const nftContract = new ethers.Contract(envs.NFTCONTRACT, nftABI, wallet);
+const duelContract = new ethers.Contract(envs.DUELCONTRACT, duelABI, walletTest);
+const nftContract = new ethers.Contract(envs.NFTCONTRACT, nftABI, walletTest);
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./wcgame-firebase-key');
