@@ -33,6 +33,8 @@ const nftABI = require('./contractABIs/nft.json');
 const verifier = new ethers.Contract(envs.VERIFIER, verifierABI, wallet);
 const duelContract = new ethers.Contract(envs.DUELCONTRACT, duelABI, walletTest);
 const nftContract = new ethers.Contract(envs.NFTCONTRACT, nftABI, walletTest);
+const itemContract = new ethers.Contract(envs.ITEMCONTRACT, itemABI, walletTest);
+const backpackContract = new ethers.Contract(envs.BACKPACKCONTRACT, packABI, walletTest);
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./wcgame-firebase-key');
@@ -87,14 +89,19 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
   for(let i = 0; i < matchSize; i++) {
     const statsA = await db.collection('Stats').doc(`${matchInfo.a[i].toNumber()}`).get();
     const statsB = await db.collection('Stats').doc(`${matchInfo.b[i].toNumber()}`).get();
+    const equipmentA = getEquip((await (itemContract._equipped(matchInfo.a[i])).toNumber());
+    const equipmentB = getEquip((await (itemContract._equipped(matchInfo.b[i])).toNumber());
+
+    console.log(equipmentA[0], equipmentB[0]);
+
     A.push({
       Owner: ownerA,
       TokenID: matchInfo.a[i].toNumber(),
-      MaxHP: statsA.data().HP,
-      Hp: statsA.data().HP,
-      Att: statsA.data().ATT,
-      Def: statsA.data().DEF,
-      Spd: statsA.data().SPD,
+      MaxHP: statsA.data().HP + (equipmentA[1] == 0 ? equipmentA[0] : 0),
+      Hp: statsA.data().HP + (equipmentA[1] == 0 ? equipmentA[0] : 0),
+      Att: statsA.data().ATT + (equipmentA[1] == 1 ? equipmentA[0] : 0),
+      Def: statsA.data().DEF + (equipmentA[1] == 2 ? equipmentA[0] : 0),
+      Spd: statsA.data().SPD + (equipmentA[1] == 3 ? equipmentA[0] : 0),
       Weapons: [statsA.data().WeaponLeft,statsA.data().WeaponRight],
       Type: statsA.data().WeaponLeft,
       nextTurn: ((gameConstants.timer/statsA.data().SPD) + 8)*1000 + startTime
@@ -102,11 +109,11 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
     B.push({
       Owner: ownerB,
       TokenID: matchInfo.b[i].toNumber(),
-      MaxHP: statsB.data().HP,
-      Hp: statsB.data().HP,
-      Att: statsB.data().ATT,
-      Def: statsB.data().DEF,
-      Spd: statsB.data().SPD,
+      MaxHP: statsB.data().HP + (equipmentB[1] == 0 ? equipmentB[0] : 0),
+      Hp: statsB.data().HP + (equipmentB[1] == 0 ? equipmentB[0] : 0),
+      Att: statsB.data().ATT + (equipmentB[1] == 1 ? equipmentB[0] : 0),
+      Def: statsB.data().DEF + (equipmentB[1] == 2 ? equipmentB[0] : 0),
+      Spd: statsB.data().SPD + (equipmentB[1] == 3 ? equipmentB[0] : 0),
       Weapons: [statsB.data().WeaponLeft,statsB.data().WeaponRight],
       Type: statsB.data().WeaponLeft,
       nextTurn: ((gameConstants.timer/statsB.data().SPD) + 8)*1000 + startTime,
@@ -145,6 +152,51 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
 
   //console.log(JSON.stringify(duelData[duelIndex], null, 2));
 });
+
+const getEquip = async (tokenId) => {
+  const equippedItem = (await itemContract._equipped(tokenId)).toNumber();
+  console.log(equippedItem);
+  var result = [0,0,0];
+    switch(equippedItem) {
+      case 5:
+        result = [1250,0,5];
+        break;
+      case 6:
+        result = [250,1,6];
+        break;
+      case 7:
+        result = [250,2,7];
+        break;
+      case 8:
+        result = [250,3,8];
+        break;
+      case 9:
+        result = [2500,0,9];
+        break;
+      case 10:
+        result = [5000,0,10];
+        break;
+      case 11:
+        result = [500,1,11];
+        break;
+      case 12:
+        result = [1000,1,12];
+        break;
+      case 13:
+        result = [500,2,13];
+        break;
+      case 14:
+        result = [1000,2,14];
+        break;
+      case 15:
+        result = [500,3,15];
+        break;
+      case 16:
+        result = [1000,3,16];
+        break;
+    }
+  return result;
+}
 
 const io = new socketIo.Server(server, {
   cors: {
