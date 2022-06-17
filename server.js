@@ -95,7 +95,7 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
     const equipmentA = getEquip((await (itemContract._equipped(matchInfo.a[i].toNumber()))).toNumber());
     const equipmentB = getEquip((await (itemContract._equipped(matchInfo.b[i].toNumber()))).toNumber());
 
-    const packSize = await backpackContract._size().toNumber();
+    const packSize = (await backpackContract._size()).toNumber();
 
     var powersA = [];
     var powersB = [];
