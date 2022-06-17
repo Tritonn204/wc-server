@@ -489,57 +489,55 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         card: card,
         healing: healing,
         nextTurn: matchData.b[currentCardB].nextTurn
-      }
-    )
+      })
+    }
   }
-}
-    if (data.action == 'powerup') {
-      const ownerA = matchData.a[0].Owner;
-      const ownerB = matchData.b[0].Owner;
-      const currentCardA = matchData.currentCardA;
-      const currentCardB = matchData.currentCardB;
+  if (data.action == 'powerup') {
+    const ownerA = matchData.a[0].Owner;
+    const ownerB = matchData.b[0].Owner;
+    const currentCardA = matchData.currentCardA;
+    const currentCardB = matchData.currentCardB;
 
-      var effectorA = matchData.powersA[data.choice];
-      var effectorB = matchData.powersB[data.choice];
+    var effectorA = matchData.powersA[data.choice];
+    var effectorB = matchData.powersB[data.choice];
 
-      if (account == ownerA) {
-        const tx = await backpackContract.usePotion(ownerA, data.choice);
-        if (!matchData.usedA){
-          tx.wait.then(() => {
-            matchData.statusA = effectorA;
-            matchData.usedA = true;
-            if (typeof cb == 'function') {
-              cb({
-                power: effectorA
-              })
-            }
-            socket.broadcast.emit('healCard',
-            {
+    if (account == ownerA) {
+      const tx = await backpackContract.usePotion(ownerA, data.choice);
+      if (!matchData.usedA){
+        tx.wait.then(() => {
+          matchData.statusA = effectorA;
+          matchData.usedA = true;
+          if (typeof cb == 'function') {
+            cb({
               power: effectorA
-            }
+            })
+          }
+          socket.broadcast.emit('healCard',
+          {
+            power: effectorA
           })
         })
       }
     }
 
-      if (account == ownerB) {
-        if (!matchData.usedB){
-          const tx = await backpackContract.usePotion(ownerB, data.choice);
-          tx.wait.then(() => {
-            matchData.statusB = effectorB;
-            matchData.usedB = true;
-            if (typeof cb == 'function') {
-              cb({
-                power: effectorB
-              })
-            }
-            socket.broadcast.emit('healCard',
-            {
+    if (account == ownerB) {
+      if (!matchData.usedB){
+        const tx = await backpackContract.usePotion(ownerB, data.choice);
+        tx.wait.then(() => {
+          matchData.statusB = effectorB;
+          matchData.usedB = true;
+          if (typeof cb == 'function') {
+            cb({
               power: effectorB
-            }
+            })
+          }
+          socket.broadcast.emit('healCard',
+          {
+            power: effectorB
           })
         })
       }
     }
-  });
+  }
+});
 }
