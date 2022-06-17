@@ -29,6 +29,8 @@ const wallet = new ethers.Wallet(envs.PRIVKEY, ftmProvider);
 const verifierABI = require('./contractABIs/verifier.json');
 const duelABI = require('./contractABIs/duel.json');
 const nftABI = require('./contractABIs/nft.json');
+const itemABI = require('./contractABIs/item.json');
+const packABI = require('./contractABIs/pack.json');
 
 const verifier = new ethers.Contract(envs.VERIFIER, verifierABI, wallet);
 const duelContract = new ethers.Contract(envs.DUELCONTRACT, duelABI, walletTest);
