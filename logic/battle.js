@@ -57,6 +57,9 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         if (now < matchData.a[matchData.currentCardA].nextTurn) return;
         let delta = (now - matchData.a[matchData.currentCardA].nextTurn)/1000;
 
+        matchData.a[matchData.currentCardA].nextTurn = ((((gameConstants.timer/matchData.a[matchData.currentCardA].Spd) + 8)*1000)/(matchData.statusA == 2 ? 2 : 1)) + now;
+        if (matchData.statusA == 2) matchData.statusA = 0;
+
         if (matchData.statusB == 1) {
           matchData.statusB = 0;
           if (typeof cb == 'function') cb({
@@ -87,9 +90,6 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
 
         var advantage = multArray[matchData.a[matchData.currentCardA].Weapons[weaponChoice]][matchData.b[matchData.currentCardB].Type];
         var damage = (((matchData.a[matchData.currentCardA].Att*damageBase)/matchData.b[matchData.currentCardB].Def)*advantage)*(1+currentCrit);
-
-        matchData.a[matchData.currentCardA].nextTurn = ((((gameConstants.timer/matchData.a[matchData.currentCardA].Spd) + 8)*1000)/matchData.statusA == 2 ? 2 : 1) + now;
-        if (matchData.statusA == 2) matchData.statusA = 0;
 
         matchData.a[matchData.currentCardA].Type = matchData.a[matchData.currentCardA].Weapons[weaponChoice];
 
@@ -213,6 +213,9 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         if (now < matchData.b[matchData.currentCardB].nextTurn) return;
         let delta = (now - matchData.b[matchData.currentCardB].nextTurn)/1000;
 
+        matchData.b[matchData.currentCardB].nextTurn = ((((gameConstants.timer/matchData.b[matchData.currentCardB].Spd) + 8)*1000)/(matchData.statusB == 2 ? 2 : 1)) + now;
+        if (matchData.statusB == 2) matchData.statusB = 0;
+
         if (matchData.statusA == 1) {
           matchData.statusA = 0;
           if (typeof cb == 'function') cb({
@@ -243,9 +246,6 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
 
         var advantage = multArray[matchData.b[matchData.currentCardB].Weapons[weaponChoice]][matchData.a[matchData.currentCardA].Type];
         var damage = (((matchData.b[matchData.currentCardB].Att*damageBase)/matchData.a[matchData.currentCardA].Def)*advantage)*(1+currentCrit);
-
-        matchData.b[matchData.currentCardB].nextTurn = ((((gameConstants.timer/matchData.b[matchData.currentCardB].Spd) + 8)*1000)/matchData.statusB == 2 ? 2 : 1) + now;
-        if (matchData.statusB == 2) matchData.statusB = 0;
 
         matchData.b[matchData.currentCardB].Type = matchData.b[matchData.currentCardB].Weapons[weaponChoice];
 
