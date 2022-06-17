@@ -60,7 +60,8 @@ if (SMDATA != undefined) {
   });
 }
 
-duelContract.on('DuelStarted', async (matchInfo, nameA, nameB) => {
+const myEventFilter = duelContract.filters.DuelStarted(null, null, null);
+duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
   console.log('duel started');
   const currentIndex = duelIndex.valueOf();
   duelIndex++;
