@@ -502,39 +502,35 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     var effectorB = matchData.powersB[data.choice];
 
     if (account == ownerA) {
-      const tx = await backpackContract.usePotion(ownerA, data.choice);
       if (!matchData.usedA){
-        tx.wait().then(() => {
-          matchData.statusA = effectorA;
-          matchData.usedA = true;
-          if (typeof cb == 'function') {
-            cb({
-              power: effectorA
-            })
-          }
-          socket.broadcast.emit('healCard',
-          {
+        matchData.statusA = effectorA;
+        matchData.burnItemA = effectorA;
+        matchData.usedA = true;
+        if (typeof cb == 'function') {
+          cb({
             power: effectorA
           })
+        }
+        socket.broadcast.emit('healCard',
+        {
+          power: effectorA
         })
       }
     }
 
     if (account == ownerB) {
       if (!matchData.usedB){
-        const tx = await backpackContract.usePotion(ownerB, data.choice);
-        tx.wait().then(() => {
-          matchData.statusB = effectorB;
-          matchData.usedB = true;
-          if (typeof cb == 'function') {
-            cb({
-              power: effectorB
-            })
-          }
-          socket.broadcast.emit('healCard',
-          {
+        matchData.statusB = effectorB;
+        matchData.burnItemB = effectorB;
+        matchData.usedB = true;
+        if (typeof cb == 'function') {
+          cb({
             power: effectorB
           })
+        }
+        socket.broadcast.emit('healCard',
+        {
+          power: effectorB
         })
       }
     }
