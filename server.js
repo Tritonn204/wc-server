@@ -198,7 +198,7 @@ const addData = async (wins, losses, owner, name, elo) => {
     Name: N,
     Elo: elo
   }
-  const res = await db.collection('Leaderboard').doc(owner.toString()).set(data);
+  //const res = await db.collection('Leaderboard').doc(owner.toString()).set(data);
 };
 
 const startBroadcast = (room) => {
@@ -220,7 +220,7 @@ const startBroadcast = (room) => {
                   list: admin.firestore.FieldValue.arrayUnion(`${duelData[room].index}`)
                 });
 
-                await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
+                //await db.collection(`MatchHistory_${symbol}`).doc(`${duelData[room].index}`).set(duelData[room]);
                 await addData(duelData[room].recordA.wins, duelData[room].recordA.losses, duelData[room].a[0].Owner, duelData[room].aName, duelData[room].newEloA);
                 await addData(duelData[room].recordB.wins, duelData[room].recordB.losses, duelData[room].b[0].Owner, duelData[room].bName, duelData[room].newEloB);
               } catch(e) {
