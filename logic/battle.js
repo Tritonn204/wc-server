@@ -180,7 +180,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
             try{
               await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
               await db.collection(`UnendedMatches`).doc(`${matchData.index}`).set({
-                args: [matchData.index, 0, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB]]
+                args: {[matchData.index], [0], [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB]}
               });
             }catch(e2){
               console.log(e2);
@@ -336,7 +336,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
             try{
               await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
               await db.collection(`UnendedMatches`).doc(`${matchData.index}`).set({
-                args: [matchData.index, 1, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB]]
+                args: {[matchData.index], [1], [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB]}
               });
             }catch(e2){
               console.log(e2);
