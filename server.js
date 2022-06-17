@@ -91,10 +91,20 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
   for(let i = 0; i < matchSize; i++) {
     const statsA = await db.collection('Stats').doc(`${matchInfo.a[i].toNumber()}`).get();
     const statsB = await db.collection('Stats').doc(`${matchInfo.b[i].toNumber()}`).get();
+
     const equipmentA = getEquip((await (itemContract._equipped(matchInfo.a[i].toNumber()))).toNumber());
     const equipmentB = getEquip((await (itemContract._equipped(matchInfo.b[i].toNumber()))).toNumber());
 
-    console.log(equipmentA[0], equipmentB[0]);
+    const tempA = await backpackContract._userItems(ownerA.toLowerCase());
+    const tempB = await backpackContract._userItems(ownerB.toLowerCase());
+
+    var powersA = [];
+    var powersB = [];
+
+    for(let i = 0; i < tempA.length; i++) {
+      powersA.push(tempA[i].toNumber());
+      powersB.push(tempB[i].toNumber());
+    }
 
     A.push({
       Owner: ownerA,
@@ -130,6 +140,12 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
     recordB: {wins: recordB.wins.toNumber(), losses: recordB.losses.toNumber()},
     nextSwapA: startTime,
     nextSwapB: startTime,
+    powersA: powersA,
+    powersB: powersB,
+    statusA: 0,
+    statusB: 0,
+    usedA: false,
+    usedB: false,
     a: A,
     b: B,
     eloA: recordA.elo.toNumber(),
@@ -227,7 +243,7 @@ io.on("connection", socket => {
     if (duelByWallet[socket.userData.wallet] != undefined && duelData[duelByWallet[socket.userData.wallet]] != undefined) {
       console.log('found');
       socket.join(duelByWallet[socket.userData.wallet]);
-      battleLogic.battleActionListener(duelData[duelByWallet[socket.userData.wallet]] ,socket, duelContract, db);
+      battleLogic.battleActionListener(duelData[duelByWallet[socket.userData.wallet]] ,socket, duelContract, backpackContract, db);
       if (typeof cb == 'function') cb(duelData[duelByWallet[socket.userData.wallet]]);
     }
   });
