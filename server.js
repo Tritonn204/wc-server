@@ -91,8 +91,8 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
   for(let i = 0; i < matchSize; i++) {
     const statsA = await db.collection('Stats').doc(`${matchInfo.a[i].toNumber()}`).get();
     const statsB = await db.collection('Stats').doc(`${matchInfo.b[i].toNumber()}`).get();
-    const equipmentA = getEquip((await (itemContract._equipped(matchInfo.a[i]))).toNumber());
-    const equipmentB = getEquip((await (itemContract._equipped(matchInfo.b[i]))).toNumber());
+    const equipmentA = getEquip((await (itemContract._equipped(matchInfo.a[i].toNumber()))).toNumber());
+    const equipmentB = getEquip((await (itemContract._equipped(matchInfo.b[i].toNumber()))).toNumber());
 
     console.log(equipmentA[0], equipmentB[0]);
 
