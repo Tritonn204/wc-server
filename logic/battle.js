@@ -94,7 +94,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         matchData.a[matchData.currentCardA].Type = matchData.a[matchData.currentCardA].Weapons[weaponChoice];
 
         if (matchData.statusA == 3) {
-          damage = (damage*2)/matchData.matchSize;
+          damage = (damage*1.5)/matchData.matchSize;
           matchData.statusA = 0;
 
           for (let i = 0; i < matchData.matchSize; i++) {
@@ -175,12 +175,12 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
           matchData.recordA.wins++;
           matchData.recordB.losses++;
           try {
-            await battleContract.endDuel(matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo, {gasPrice: 700000000000});
+            await battleContract.endDuel(matchData.index, 0, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB] {gasPrice: 700000000000});
           } catch(e) {
             try{
               await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
               await db.collection(`UnendedMatches`).doc(`${matchData.index}`).set({
-                args: [matchData.index, 0, eloCalc.winnerElo, eloCalc.loserElo]
+                args: [matchData.index, 0, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB]]
               });
             }catch(e2){
               console.log(e2);
@@ -250,7 +250,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         matchData.b[matchData.currentCardB].Type = matchData.b[matchData.currentCardB].Weapons[weaponChoice];
 
         if (matchData.statusB == 3) {
-          damage = (damage*2)/matchData.matchSize;
+          damage = (damage*1.5)/matchData.matchSize;
           matchData.statusB = 0;
 
           for (let i = 0; i < matchData.matchSize; i++) {
@@ -331,10 +331,13 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
           matchData.recordB.wins++;
           matchData.recordA.losses++;
           try {
-            await battleContract.endDuel(matchData.index, 1, eloCalc.winnerElo, eloCalc.loserElo, {gasPrice: 700000000000});
+            await battleContract.endDuel(matchData.index, 1, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB] {gasPrice: 700000000000});
           } catch(e) {
             try{
               await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});
+              await db.collection(`UnendedMatches`).doc(`${matchData.index}`).set({
+                args: [matchData.index, 1, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA, matchData.burnItemB]]
+              });
             }catch(e2){
               console.log(e2);
             }
@@ -438,7 +441,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
           matchData.a[card].Hp += healing;
         }
 
-        matchData.a[currentCardA].nextTurn = ((((gameConstants.timer/matchData.a[currentCardA].Spd) + 8)*1000)/matchData.statusA == 2 ? 2 : 1) + now;
+        matchData.a[currentCardA].nextTurn = ((((gameConstants.timer/matchData.a[currentCardA].Spd) + 8)*1000)/matchData.statusA == 2 ? 3 : 1) + now;
         if (matchData.statusA == 2) matchData.statusA = 0;
 
         if (typeof cb == 'function') {
@@ -474,7 +477,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         matchData.b[card].Hp += healing;
       }
 
-      matchData.b[currentCardB].nextTurn = ((((gameConstants.timer/matchData.b[currentCardB].Spd) + 8)*1000)/matchData.statusB == 2 ? 2 : 1) + now;
+      matchData.b[currentCardB].nextTurn = ((((gameConstants.timer/matchData.b[currentCardB].Spd) + 8)*1000)/matchData.statusB == 2 ? 3 : 1) + now;
       if (matchData.statusB == 2) matchData.statusB = 0;
 
       if (typeof cb == 'function') {
@@ -504,7 +507,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     if (account == ownerA) {
       if (matchData.usedA == false){
         matchData.statusA = effectorA;
-        matchData.burnItemA = effectorA;
+        matchData.burnItemA = data.choice;
         matchData.usedA = true;
         console.log(matchData);
         if (typeof cb == 'function') {
@@ -522,7 +525,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
     if (account == ownerB) {
       if (matchData.usedB == false){
         matchData.statusB = effectorB;
-        matchData.burnItemB = effectorB;
+        matchData.burnItemB = data.choice;
         matchData.usedB = true;
 
         console.log(matchData);
