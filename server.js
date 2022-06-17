@@ -101,8 +101,16 @@ duelContract.on(myEventFilter, async (matchInfo, nameA, nameB) => {
     var powersB = [];
 
     for(let i = 0; i < packSize; i++) {
-      powersA.push((await backpackContract._userItems(ownerA,i)).toNumber());
-      powersB.push((await backpackContract._userItems(ownerB,i)).toNumber());
+      try {
+        powersA.push((await backpackContract._userItems(ownerA,i)).toNumber());
+      } catch(e) {
+        powersA.push(0);
+      }
+      try {
+        powersB.push((await backpackContract._userItems(ownerB,i)).toNumber());
+      } catch(e) {
+        powersB.push(0);
+      }
     }
 
     A.push({
