@@ -341,15 +341,15 @@ setInterval(async () => {
       });
     } catch(e) {}
   })
-  query2.data().list.forEach(async (entry) => {
-    try{
-      const tx = await duelContract.endDuelDraw(entry);
-      tx.wait().then(async() => {
-        const query3 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
-        query3.update({
-          list: admin.firestore.FieldValue.arrayRemove(match)
-        });
-      });
-    } catch(e) {}
-  })
+  // query2.data().list.forEach(async (entry) => {
+  //   try{
+  //     const tx = await duelContract.endDuelDraw(entry);
+  //     tx.wait().then(async() => {
+  //       const query3 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
+  //       query3.update({
+  //         list: admin.firestore.FieldValue.arrayRemove(match)
+  //       });
+  //     });
+  //   } catch(e) {}
+  // })
 }, retryInterval)
