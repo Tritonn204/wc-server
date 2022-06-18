@@ -57,9 +57,13 @@ var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatche
 var SMDATA = stuckMatches.data().list;
 if (SMDATA != undefined) {
   SMDATA.forEach((match, i) => {
-    const query2 = db.collection(`PersistentMatchData`).doc(`OngoingMatches`);
+    const query2 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
+    const query3 = db.collection(`PersistentMatchData`).doc(`OngoingMatches`);
     query2.update({
       list: admin.firestore.FieldValue.arrayUnion(match)
+    });
+    query3.update({
+      list: admin.firestore.FieldValue.arrayRemove(match)
     });
   });
 }
@@ -326,13 +330,27 @@ const startBroadcast = (room) => {
 
 setInterval(async () => {
   const query = await db.collection(`UnendedMatches`).get();
+  const query2 = db.collection(`PersistentMatchData`).doc(`StuckMatches`).get();
   query.forEach(async (entry) => {
     const ARGS = entry.data().args;
     const PRICE = entry.data().gasPrice;
     try{
-      const tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: 700000000000});
+      const tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: PRICE*1.1, gasLimit: 800000});
       tx.wait().then(async() => {
         await entry.ref.delete();
+      });
+    } catch(e) {}
+  })
+  query2.forEach(async (entry) => {
+    const ARGS = entry.data().args;
+    const PRICE = entry.data().gasPrice;
+    try{
+      const tx = await duelContract.endDuelDraw(entry);
+      tx.wait().then(async() => {
+        const query3 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
+        query3.update({
+          list: admin.firestore.FieldValue.arrayRemove(match)
+        });
       });
     } catch(e) {}
   })
