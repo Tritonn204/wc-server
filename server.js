@@ -341,9 +341,7 @@ setInterval(async () => {
       });
     } catch(e) {}
   })
-  query2.forEach(async (entry) => {
-    const ARGS = entry.data().args;
-    const PRICE = entry.data().gasPrice;
+  query2.data().list.forEach(async (entry) => {
     try{
       const tx = await duelContract.endDuelDraw(entry);
       tx.wait().then(async() => {
