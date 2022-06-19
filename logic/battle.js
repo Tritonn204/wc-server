@@ -331,7 +331,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
           matchData.recordB.wins++;
           matchData.recordA.losses++;
           try {
-            await battleContract.endDuel(matchData.index, 1, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA || 1000, matchData.burnItemB || 1000], {gasPrice: 700000000000, gasLimit: 5000000});
+            await battleContract.endDuel(matchData.index, 1, [eloCalc.winnerElo, eloCalc.loserElo], [matchData.burnItemA || 1000, matchData.burnItemB || 1000], {gasPrice: 100000000000, gasLimit: 5000000});
           } catch(e) {
             try{
               await db.collection(`MatchErrorLogs`).doc(`${matchData.index}`).set({error: e.message});

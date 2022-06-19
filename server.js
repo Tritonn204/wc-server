@@ -16,7 +16,7 @@ const port = parseInt(process.env.PORT) || 4000;
 const server = http.createServer(expressApp);
 const socketIo = require('socket.io');
 const interval = 1000/20;
-const retryInterval = 60000;
+const retryInterval = 10000;
 
 server.listen(port);
 console.log(`Listening on port ${port}`);
