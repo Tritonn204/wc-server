@@ -56,7 +56,7 @@ const duelByWallet = {};
 var stuckMatches = await db.collection(`PersistentMatchData`).doc('OngoingMatches').get();
 var SMDATA = stuckMatches.data().list;
 if (SMDATA != undefined) {
-  SMDATA.forEach((match, i) => {
+  SMDATA.forEach(async(match, i) => {
     const query2 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
     const query3 = db.collection(`PersistentMatchData`).doc(`OngoingMatches`);
     query3.update({
