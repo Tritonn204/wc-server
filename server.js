@@ -342,7 +342,7 @@ setInterval(async () => {
     const ARGS = entry.data().args;
     const PRICE = entry.data().gasPrice;
     try{
-      var tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: PRICE*1.1, gasLimit: 800000});
+      var tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: PRICE*1.1, gasLimit: 5000000});
       await tx.wait().then(async() => {
         await entry.ref.delete();
       });
