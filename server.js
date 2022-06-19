@@ -335,18 +335,25 @@ const startBroadcast = (room) => {
     return setTimeout(heartbeat, interval);
 }
 
+var pendingRetryAttempt = {};
+
 setInterval(async () => {
   const query = await db.collection(`UnendedMatches`).get();
   const query2 = db.collection(`PersistentMatchData`).doc(`StuckMatches`).get();
   query.forEach(async (entry) => {
     const ARGS = entry.data().args;
     const PRICE = entry.data().gasPrice;
-    try{
-      var tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: PRICE*1.1, gasLimit: 5000000});
-      await tx.wait().then(async() => {
-        await entry.ref.delete();
-      });
-    } catch(e) {}
+    if (pendingRetryAttempt[ARGS] == undefined) {
+      try{
+        pendingRetryAttempt[ARGS] = true;
+        var tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: Math.min(PRICE*1.1,700000000000), gasLimit: 5000000});
+        await tx.wait().then(async() => {
+          await entry.ref.delete();
+        });
+      } catch(e) {
+        delete pendingRetryAttempt[ARGS];
+      }
+    }
   })
   // query2.data().list.forEach(async (entry) => {
   //   try{
