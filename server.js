@@ -59,12 +59,19 @@ if (SMDATA != undefined) {
   SMDATA.forEach((match, i) => {
     const query2 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
     const query3 = db.collection(`PersistentMatchData`).doc(`OngoingMatches`);
-    query2.update({
-      list: admin.firestore.FieldValue.arrayUnion(match)
-    });
     query3.update({
       list: admin.firestore.FieldValue.arrayRemove(match)
     });
+    try{
+      const tx = await duelContract.endDuelDraw(match);
+      await tx.wait().then(async() => {
+        const query3 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
+      });
+    } catch(e) {
+      query2.update({
+        list: admin.firestore.FieldValue.arrayUnion(match)
+      });
+    }
   });
 }
 
