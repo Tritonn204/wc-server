@@ -441,7 +441,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
           matchData.a[card].Hp += healing;
         }
 
-        matchData.a[currentCardA].nextTurn = ((((gameConstants.timer/matchData.a[currentCardA].Spd) + 8)*1000)/matchData.statusA == 2 ? 3 : 1) + now;
+        matchData.a[currentCardA].nextTurn = ((((gameConstants.timer/matchData.a[currentCardA].Spd) + 8)*1000)/(matchData.statusA == 2 ? 3 : 1)) + now;
         if (matchData.statusA == 2) matchData.statusA = 0;
 
         if (typeof cb == 'function') {
@@ -477,7 +477,7 @@ export const battleActionListener = (matchData, socket, battleContract, backpack
         matchData.b[card].Hp += healing;
       }
 
-      matchData.b[currentCardB].nextTurn = ((((gameConstants.timer/matchData.b[currentCardB].Spd) + 8)*1000)/matchData.statusB == 2 ? 3 : 1) + now;
+      matchData.b[currentCardB].nextTurn = ((((gameConstants.timer/matchData.b[currentCardB].Spd) + 8)*1000)/(matchData.statusB == 2 ? 3 : 1)) + now;
       if (matchData.statusB == 2) matchData.statusB = 0;
 
       if (typeof cb == 'function') {
