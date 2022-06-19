@@ -63,7 +63,7 @@ if (SMDATA != undefined) {
       list: admin.firestore.FieldValue.arrayRemove(match)
     });
     try{
-      const tx = await duelContract.endDuelDraw(match);
+      var tx = await duelContract.endDuelDraw(match);
       await tx.wait().then(async() => {
         const query3 = db.collection(`PersistentMatchData`).doc(`StuckMatches`);
       });
