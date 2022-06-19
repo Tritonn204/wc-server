@@ -348,6 +348,7 @@ setInterval(async () => {
         pendingRetryAttempt[ARGS] = true;
         var tx = await duelContract.endDuel(JSON.parse(ARGS), {gasPrice: Math.min(PRICE*1.1,700000000000), gasLimit: 5000000});
         await tx.wait().then(async() => {
+          delete pendingRetryAttempt[ARGS];
           await entry.ref.delete();
         });
       } catch(e) {
